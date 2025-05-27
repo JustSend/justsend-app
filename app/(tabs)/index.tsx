@@ -1,7 +1,7 @@
 import { View, StyleSheet } from 'react-native';
-import QuickActions from '../components/QuickActions';
-import TransactionList from '../components/TransactionList';
-import BalanceCard from '../components/BalanceCard';
+import QuickActions from '../../components/QuickActions';
+import TransactionList from '../../components/TransactionList';
+import BalanceCard from '../../components/BalanceCard';
 
 const mockTransactions = [
   { id: '1', title: 'Starbucks', amount: -4.5 },
