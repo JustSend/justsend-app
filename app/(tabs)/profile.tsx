@@ -1,5 +1,5 @@
 import { View, StyleSheet, Button } from 'react-native';
-import ProfileCard from '../components/ProfileCard';
+import ProfileCard from '../../components/ProfileCard';
 
 export default function ProfileScreen() {
   return (
