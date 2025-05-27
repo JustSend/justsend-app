@@ -1,4 +1,7 @@
-#!/bin/sh
+mkdir -p .husky
+echo '#!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx prettier --write .
+npm run format-and-stage
+' > .husky/pre-commit
+chmod +x .husky/pre-commit
