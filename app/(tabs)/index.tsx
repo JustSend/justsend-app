@@ -1,25 +1,25 @@
-import { View, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import { useAuth } from '@/components/AuthContext';
 import QuickActions from '../../components/QuickActions';
 import TransactionList from '../../components/TransactionList';
 import BalanceCard from '../../components/BalanceCard';
+import { mockTransactions } from '@/lib/mockdata';
 
-const mockTransactions = [
-  { id: '1', title: 'Starbucks', amount: -4.5 },
-  { id: '2', title: 'Payment from Ana', amount: 100 },
-];
+export default function Home() {
+  const { user } = useAuth();
 
-export default function HomeScreen() {
   return (
-    <View style={styles.container}>
+    <View className="flex-1 p-4 bg-white">
+      <Text className="text-2xl font-bold mb-4">Welcome, {user?.email}</Text>
+      <View className="bg-primary/10 p-4 rounded-lg">
+        <Text className="text-lg font-semibold mb-2">Quick Actions</Text>
+        <Text className="text-gray-600">
+          Your recent transactions and account summary will appear here.
+        </Text>
+      </View>
       <BalanceCard balance={237.5} />
       <QuickActions />
       <TransactionList transactions={mockTransactions} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-});
