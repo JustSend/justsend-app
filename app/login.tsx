@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
+import { router } from 'expo-router';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ export default function Login() {
   async function handleLogin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      router.navigate('/');
     } catch (err: any) {
       setError(err.message);
     }
