@@ -3,7 +3,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   const menuItems = [
     {
@@ -54,10 +54,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         ))}
 
-        <TouchableOpacity
-          onPress={signOut}
-          className="flex-row items-center p-4 bg-red-50 rounded-lg mt-4"
-        >
+        <TouchableOpacity className="flex-row items-center p-4 bg-red-50 rounded-lg mt-4">
           <Ionicons name="log-out-outline" size={24} color="#dc2626" />
           <Text className="ml-4 text-lg text-red-600 flex-1">Sign Out</Text>
         </TouchableOpacity>

@@ -1,70 +1,31 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/firebaseConfig';
-import { router } from 'expo-router';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
-type AuthContextType = {
+const AuthContext = createContext<{
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-};
+}>({
+  user: null,
+  loading: true,
+});
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user data
-    const checkUser = async () => {
-      try {
-        // TODO: Implement actual auth check
-        setLoading(false);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setLoading(false);
-      }
-    };
-
-    checkUser();
+    const auth = getAuth();
+    return onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      // TODO: Implement actual sign in
-      // For now, we'll just set the user to null since we can't create a mock Firebase User
-      setUser(null);
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error('Sign in failed:', error);
-      throw error;
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      // TODO: Implement actual sign out
-      setUser(null);
-      router.replace('/login');
-    } catch (error) {
-      console.error('Sign out failed:', error);
-      throw error;
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+export const useAuth = () => useContext(AuthContext);
