@@ -1,10 +1,18 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
 import { mockTransactions } from '@/lib/mockdata';
+import { GlobalStyles } from '@/styles/globalStyles';
+import { Colors } from '@/styles/theme';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -46,36 +54,36 @@ export default function HomeScreen() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="bg-blue-600 p-6 flex-row justify-between items-center">
+    <ScrollView contentContainerStyle={GlobalStyles.container}>
+      <View style={GlobalStyles.header}>
         <View>
-          <Text className="text-white text-lg">Welcome back,</Text>
-          <Text className="text-white text-2xl font-bold">
-            {user?.email || 'Guest User'}
-          </Text>
+          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.emailText}>{user?.email || 'Guest User'}</Text>
         </View>
         <TouchableOpacity onPress={handleSignOut}>
-          <Ionicons name="log-out-outline" size={24} color="white" />
+          <Ionicons name="log-out-outline" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
 
-      <View className="p-4">
-        <View className="bg-white rounded-lg p-4 mb-4">
-          <Text className="text-gray-500 mb-2">Total Balance</Text>
-          <Text className="text-3xl font-bold">$1,234.56</Text>
+      <View style={GlobalStyles.content}>
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Total Balance</Text>
+          <Text style={styles.balanceValue}>$1,234.56</Text>
         </View>
 
-        <Text className="text-lg font-bold mb-4">Quick Actions</Text>
-        <View className="flex-row flex-wrap justify-between">
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={styles.actionsWrapper}>
           {quickActions.map((action, index) => (
             <TouchableOpacity
               key={index}
               onPress={action.onPress}
-              className="w-[48%] bg-white rounded-lg p-4 mb-4 items-center"
+              style={styles.actionCard}
             >
               <View
-                className="w-12 h-12 rounded-full items-center justify-center mb-2"
-                style={{ backgroundColor: `${action.color}20` }}
+                style={[
+                  GlobalStyles.iconWrapper,
+                  { backgroundColor: `${action.color}20` },
+                ]}
               >
                 <Ionicons
                   name={action.icon as any}
@@ -83,27 +91,28 @@ export default function HomeScreen() {
                   color={action.color}
                 />
               </View>
-              <Text className="text-center">{action.title}</Text>
+              <Text style={styles.actionText}>{action.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text className="text-lg font-bold mb-4 mt-2">Recent Transactions</Text>
+        <Text style={styles.sectionTitle}>Recent Transactions</Text>
         {mockTransactions.map((transaction) => (
-          <View
-            key={transaction.id}
-            className="flex-row items-center justify-between bg-white p-4 rounded-lg mb-2"
-          >
+          <View key={transaction.id} style={styles.transactionCard}>
             <View>
-              <Text className="font-semibold">{transaction.title}</Text>
-              <Text className="text-gray-500 text-sm">{transaction.date}</Text>
+              <Text style={styles.transactionTitle}>{transaction.title}</Text>
+              <Text style={styles.transactionDate}>{transaction.date}</Text>
             </View>
             <Text
-              className={`font-semibold ${
-                transaction.type === 'income'
-                  ? 'text-green-600'
-                  : 'text-red-600'
-              }`}
+              style={[
+                styles.transactionAmount,
+                {
+                  color:
+                    transaction.type === 'income'
+                      ? Colors.income
+                      : Colors.expense,
+                },
+              ]}
             >
               {transaction.type === 'income' ? '+' : ''}
               {transaction.amount.toLocaleString('en-US', {
@@ -117,3 +126,74 @@ export default function HomeScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  welcomeText: {
+    fontSize: 16,
+    color: Colors.white,
+  },
+  emailText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.white,
+  },
+  balanceCard: {
+    backgroundColor: Colors.white,
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  balanceValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 12,
+  },
+  actionsWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  actionCard: {
+    width: '47%',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  actionText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  transactionCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  transactionTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  transactionDate: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});

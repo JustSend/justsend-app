@@ -11,6 +11,8 @@ import {
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
+import { Colors } from '@/styles/theme';
+import Toast from 'react-native-toast-message';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -20,6 +22,10 @@ export default function Register() {
   async function handleRegister() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      Toast.show({
+        type: 'success',
+        text1: 'Registration successful!',
+      });
       router.navigate('/login');
     } catch (err: any) {
       setError(err.message);
@@ -51,7 +57,16 @@ export default function Register() {
         <View style={styles.buttonContainer}>
           <Button title="Register" onPress={handleRegister} />
         </View>
+
         {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <View style={[styles.buttonContainer, { marginTop: 12 }]}>
+          <Button
+            title="Login"
+            color={Colors.gray}
+            onPress={() => router.navigate('/login')}
+          />
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

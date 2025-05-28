@@ -4,13 +4,16 @@ import {
   TextInput,
   Button,
   Text,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
+import { GlobalStyles } from '@/styles/globalStyles';
+import { Colors } from '@/styles/theme';
+import { errorMessages } from '@/lib/fireBaseErrors';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,82 +24,77 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.navigate('/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const firebaseErrorMatch = error.message.match(/\(auth\/[a-z-]+\)/);
+        if (firebaseErrorMatch) {
+          const errorCode = firebaseErrorMatch[0].replace(/[()]/g, '');
+          setError(
+            errorMessages[errorCode] || 'An error occurred. Please try again.'
+          );
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError('An unknown error occurred. Please try again.');
+      }
     }
   }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
+      style={GlobalStyles.container}
     >
-      <View style={styles.card}>
-        <Text style={styles.title}>Welcome Back</Text>
+      <View style={GlobalStyles.card}>
+        <Text style={styles.appName}>JustSend</Text>
+        <Text style={GlobalStyles.title}>Welcome Back</Text>
+
         <TextInput
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          style={styles.input}
+          style={GlobalStyles.input}
         />
         <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          style={styles.input}
+          style={GlobalStyles.input}
         />
-        <View style={styles.buttonContainer}>
+        <View style={GlobalStyles.buttonContainer}>
           <Button title="Login" onPress={handleLogin} />
         </View>
-        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        {error && <Text style={GlobalStyles.errorText}>{error}</Text>}
+
+        <View style={GlobalStyles.buttonContainer}>
+          <Button
+            title="Register"
+            color={Colors.gray}
+            onPress={() => router.navigate('/register')}
+          />
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F2F2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
     marginBottom: 20,
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: 'bold',
     textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  buttonContainer: {
-    marginTop: 8,
-  },
-  errorText: {
-    marginTop: 12,
-    color: 'red',
-    textAlign: 'center',
+    marginBottom: 8,
+    color: Colors.primary,
   },
 });
