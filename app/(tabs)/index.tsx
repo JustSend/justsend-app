@@ -1,9 +1,22 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/components/AuthProvider';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebaseConfig';
+import { router } from 'expo-router';
+import { mockTransactions } from '@/lib/mockdata';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.replace('/login');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
   const quickActions = [
     {
@@ -32,37 +45,18 @@ export default function HomeScreen() {
     },
   ];
 
-  const recentTransactions = [
-    {
-      id: '1',
-      title: 'Salary',
-      amount: 1000,
-      date: 'Today',
-      type: 'income',
-    },
-    {
-      id: '2',
-      title: 'Groceries',
-      amount: -50,
-      date: 'Yesterday',
-      type: 'expense',
-    },
-    {
-      id: '3',
-      title: 'Rent',
-      amount: -200,
-      date: 'Mar 15',
-      type: 'expense',
-    },
-  ];
-
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="bg-blue-600 p-6">
-        <Text className="text-white text-lg">Welcome back,</Text>
-        <Text className="text-white text-2xl font-bold">
-          {user?.email || 'Guest User'}
-        </Text>
+      <View className="bg-blue-600 p-6 flex-row justify-between items-center">
+        <View>
+          <Text className="text-white text-lg">Welcome back,</Text>
+          <Text className="text-white text-2xl font-bold">
+            {user?.email || 'Guest User'}
+          </Text>
+        </View>
+        <TouchableOpacity onPress={handleSignOut}>
+          <Ionicons name="log-out-outline" size={24} color="white" />
+        </TouchableOpacity>
       </View>
 
       <View className="p-4">
@@ -95,7 +89,7 @@ export default function HomeScreen() {
         </View>
 
         <Text className="text-lg font-bold mb-4 mt-2">Recent Transactions</Text>
-        {recentTransactions.map((transaction) => (
+        {mockTransactions.map((transaction) => (
           <View
             key={transaction.id}
             className="flex-row items-center justify-between bg-white p-4 rounded-lg mb-2"

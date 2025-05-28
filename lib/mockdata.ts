@@ -3,7 +3,7 @@ export interface Transaction {
   title: string;
   amount: number;
   date: string;
-  type: 'credit' | 'debit';
+  type: 'income' | 'payment';
 }
 
 export const mockTransactions: Transaction[] = [
@@ -12,34 +12,34 @@ export const mockTransactions: Transaction[] = [
     title: 'Grocery Shopping',
     amount: -85.5,
     date: '2024-03-15',
-    type: 'debit',
+    type: 'payment',
   },
   {
     id: '2',
     title: 'Salary Deposit',
     amount: 2500.0,
     date: '2024-03-14',
-    type: 'credit',
+    type: 'income',
   },
   {
     id: '3',
     title: 'Electric Bill',
     amount: -120.75,
     date: '2024-03-13',
-    type: 'debit',
+    type: 'payment',
   },
   {
     id: '4',
     title: 'Freelance Payment',
     amount: 350.0,
     date: '2024-03-12',
-    type: 'credit',
+    type: 'payment',
   },
   {
     id: '5',
     title: 'Restaurant',
     amount: -45.2,
     date: '2024-03-11',
-    type: 'debit',
+    type: 'payment',
   },
 ];
