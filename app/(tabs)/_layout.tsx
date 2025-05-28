@@ -1,68 +1,18 @@
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { useAuth } from '@/components/AuthContext';
-import { useRouter } from 'expo-router';
+import { useAuth } from '@/components/AuthProvider';
 
-export default function TabLayout() {
-  const { token, loading } = useAuth();
+export default function TabsLayout() {
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !token) {
+    if (!loading && !user) {
       router.replace('/login');
     }
-  }, [loading, router, token]);
+  }, [user, loading]);
 
-  if (loading || !token) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#3b5998" />
-      </View>
-    );
-  }
+  if (loading) return null;
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: '#3b5998',
-        tabBarInactiveTintColor: '#666',
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: '#ddd',
-          paddingBottom: 5,
-          paddingTop: 5,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="transactions"
-        options={{
-          title: 'Transactions',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="list" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
-  );
+  return <Stack />;
 }

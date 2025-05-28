@@ -1,9 +1,9 @@
 import { View, Text } from 'react-native';
-import { useAuth } from '@/components/AuthContext';
 import QuickActions from '../../components/QuickActions';
 import TransactionList from '../../components/TransactionList';
 import BalanceCard from '../../components/BalanceCard';
 import { mockTransactions } from '@/lib/mockdata';
+import { useAuth } from '@/components/AuthProvider';
 
 export default function Home() {
   const { user } = useAuth();
