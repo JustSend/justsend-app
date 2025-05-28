@@ -3,15 +3,12 @@ import Cookies from 'js-cookie';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_API_URL || 'put variable in .env';
 
-export const axiosPublic = axios.create({
+export const api = axios.create({
   baseURL: BACKEND_URL,
+  withCredentials: true,
 });
 
-export const axiosPrivate = axios.create({
-  baseURL: BACKEND_URL,
-});
-
-axiosPrivate.interceptors.request.use(
+api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = Cookies.get('token');
 
@@ -26,7 +23,7 @@ axiosPrivate.interceptors.request.use(
   }
 );
 
-axiosPrivate.interceptors.response.use(
+api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (
