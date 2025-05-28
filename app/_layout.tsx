@@ -1,17 +1,7 @@
-import { Stack, Redirect } from 'expo-router';
-import { AuthProvider, useAuth } from '@/components/AuthProvider';
+import { Stack } from 'expo-router';
+import { AuthProvider } from '@/components/AuthProvider';
 
 function InnerLayout() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return null;
-  }
-
-  if (!user) {
-    return <Redirect href="/login" />;
-  }
-
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
