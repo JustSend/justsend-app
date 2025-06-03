@@ -7,6 +7,7 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
@@ -20,8 +21,10 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.navigate('/');
@@ -39,6 +42,8 @@ export default function Login() {
       } else {
         setError('An unknown error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -73,10 +78,17 @@ export default function Login() {
         />
 
         <TouchableOpacity
-          style={[GlobalStyles.primaryButton, GlobalStyles.buttonContainer]}
+          disabled={loading}
+          style={[
+            GlobalStyles.primaryButton,
+            GlobalStyles.buttonContainer,
+            loading && { opacity: 0.6 },
+          ]}
           onPress={handleLogin}
         >
-          <Text style={GlobalStyles.buttonText}>Sign In</Text>
+          <Text style={GlobalStyles.buttonText}>
+            {loading ? 'Signing In...' : 'Sign In'}
+          </Text>
         </TouchableOpacity>
 
         {error && <Text style={GlobalStyles.errorText}>{error}</Text>}
@@ -88,8 +100,16 @@ export default function Login() {
         </View>
 
         <TouchableOpacity
-          style={[GlobalStyles.secondaryButton, GlobalStyles.buttonContainer]}
-          onPress={() => router.navigate('/register')}
+          disabled={loading}
+          style={[
+            GlobalStyles.secondaryButton,
+            GlobalStyles.buttonContainer,
+            loading && { opacity: 0.6 },
+          ]}
+          onPress={() => {
+            Keyboard.dismiss();
+            router.navigate('/register');
+          }}
         >
           <Text style={GlobalStyles.secondaryButtonText}>Create Account</Text>
         </TouchableOpacity>

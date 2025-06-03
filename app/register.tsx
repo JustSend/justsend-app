@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
@@ -20,8 +21,10 @@ import { Logo } from '@/components/Logo';
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function handleRegister() {
+    setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -44,6 +47,8 @@ export default function Register() {
         text1: 'Registration failed',
         text2: err.message,
       });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -78,10 +83,17 @@ export default function Register() {
         />
 
         <TouchableOpacity
-          style={[GlobalStyles.primaryButton, GlobalStyles.buttonContainer]}
+          disabled={loading}
+          style={[
+            GlobalStyles.primaryButton,
+            GlobalStyles.buttonContainer,
+            loading && { opacity: 0.6 },
+          ]}
           onPress={handleRegister}
         >
-          <Text style={GlobalStyles.buttonText}>Create Account</Text>
+          <Text style={GlobalStyles.buttonText}>
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </Text>
         </TouchableOpacity>
 
         <View style={GlobalStyles.divider}>
@@ -91,8 +103,16 @@ export default function Register() {
         </View>
 
         <TouchableOpacity
-          style={[GlobalStyles.secondaryButton, GlobalStyles.buttonContainer]}
-          onPress={() => router.navigate('/login')}
+          disabled={loading}
+          style={[
+            GlobalStyles.secondaryButton,
+            GlobalStyles.buttonContainer,
+            loading && { opacity: 0.6 },
+          ]}
+          onPress={() => {
+            Keyboard.dismiss();
+            router.navigate('/login');
+          }}
         >
           <Text style={GlobalStyles.secondaryButtonText}>Sign In</Text>
         </TouchableOpacity>

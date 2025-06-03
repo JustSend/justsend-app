@@ -1,5 +1,7 @@
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, Dimensions } from 'react-native';
 import { Colors, Spacing, Typography, FontSizes, FontFamily } from './theme';
+
+const isDesktop = Dimensions.get('window').width >= 768;
 
 export const GlobalStyles = StyleSheet.create({
   container: {
@@ -20,16 +22,18 @@ export const GlobalStyles = StyleSheet.create({
     padding: Spacing.md,
   },
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: 16,
-    padding: Spacing.xl,
-    width: '100%',
-    maxWidth: 400,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: isDesktop ? Colors.card : 'transparent',
+    borderRadius: isDesktop ? 24 : 0,
+    paddingVertical: isDesktop ? Spacing.xl : 0,
+    paddingHorizontal: isDesktop ? Spacing.lg : 0,
+    width: isDesktop ? '90%' : '100%',
+    maxWidth: isDesktop ? 400 : undefined,
+    alignSelf: isDesktop ? 'center' : 'stretch',
+    shadowColor: isDesktop ? Colors.black : 'transparent',
+    shadowOffset: isDesktop ? { width: 0, height: 2 } : undefined,
+    shadowOpacity: isDesktop ? 0.1 : 0,
+    shadowRadius: isDesktop ? 8 : 0,
+    elevation: isDesktop ? 4 : 0,
   },
   iconWrapper: {
     width: 48,
