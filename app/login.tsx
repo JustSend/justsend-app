@@ -14,7 +14,7 @@ import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
 import { GlobalStyles } from '@/styles/globalStyles';
 import { Colors } from '@/styles/theme';
-import { errorMessages } from '@/lib/fireBaseErrors';
+import { errorMessages, extractCodeFromMessage } from '@/lib/fireBaseErrors';
 import { Logo } from '@/components/Logo';
 
 export default function Login() {
@@ -28,20 +28,9 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.navigate('/');
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        const firebaseErrorMatch = error.message.match(/\(auth\/[a-z-]+\)/);
-        if (firebaseErrorMatch) {
-          const errorCode = firebaseErrorMatch[0].replace(/[()]/g, '');
-          setError(
-            errorMessages[errorCode] || 'An error occurred. Please try again.'
-          );
-        } else {
-          setError(error.message);
-        }
-      } else {
-        setError('An unknown error occurred. Please try again.');
-      }
+    } catch (err: any) {
+      const code = err.code || extractCodeFromMessage(err.message);
+      setError(errorMessages[code] || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -107,6 +96,7 @@ export default function Login() {
             loading && { opacity: 0.6 },
           ]}
           onPress={() => {
+            setError(null);
             Keyboard.dismiss();
             router.navigate('/register');
           }}

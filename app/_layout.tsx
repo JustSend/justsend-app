@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { AuthProvider } from '@/components/AuthProvider';
 import Toast from 'react-native-toast-message';
+import { toastConfig } from '@/lib/toastConfig';
 
 export default function RootLayout() {
   return (
@@ -10,7 +11,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
       </Stack>
-      <Toast />
+      <Toast config={toastConfig} />
     </AuthProvider>
   );
 }

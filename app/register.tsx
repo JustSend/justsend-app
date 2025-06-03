@@ -13,18 +13,37 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
 import { Colors } from '@/styles/theme';
-import Toast from 'react-native-toast-message';
 import { apiPublic } from '@/lib/api';
 import { GlobalStyles } from '@/styles/globalStyles';
 import { Logo } from '@/components/Logo';
+import { errorMessages, extractCodeFromMessage } from '@/lib/fireBaseErrors';
+import Toast from 'react-native-toast-message';
+
+function validateEmail(email: string) {
+  return /^[^@]+@[^@]+\.[^@]+$/.test(email);
+}
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [emailTouched, setEmailTouched] = useState(false);
+
+  function handleEmailChange(text: string) {
+    setEmail(text);
+    if (emailTouched) {
+      if (!validateEmail(text)) {
+        setError('Please enter a valid email address.');
+      } else {
+        setError(null);
+      }
+    }
+  }
 
   async function handleRegister() {
     setLoading(true);
+    setError(null);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -32,21 +51,17 @@ export default function Register() {
         password
       );
       const uid = userCredential.user.uid;
-
       await apiPublic.post(`/user/${uid}`);
-
+      router.navigate('/login');
       Toast.show({
         type: 'success',
         text1: 'Registration successful!',
+        text2: 'You can now sign in.',
       });
-
-      router.navigate('/login');
     } catch (err: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Registration failed',
-        text2: err.message,
-      });
+      console.log(err);
+      const code = err.code || extractCodeFromMessage(err.message);
+      setError(errorMessages[code] || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -67,7 +82,15 @@ export default function Register() {
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={handleEmailChange}
+          onBlur={() => {
+            setEmailTouched(true);
+            if (!validateEmail(email)) {
+              setError('Please enter a valid email address.');
+            } else {
+              setError(null);
+            }
+          }}
           autoCapitalize="none"
           keyboardType="email-address"
           style={GlobalStyles.input}
@@ -96,6 +119,8 @@ export default function Register() {
           </Text>
         </TouchableOpacity>
 
+        {error && <Text style={GlobalStyles.errorText}>{error}</Text>}
+
         <View style={GlobalStyles.divider}>
           <View style={GlobalStyles.dividerLine} />
           <Text style={GlobalStyles.dividerText}>or</Text>
@@ -110,6 +135,7 @@ export default function Register() {
             loading && { opacity: 0.6 },
           ]}
           onPress={() => {
+            setError(null);
             Keyboard.dismiss();
             router.navigate('/login');
           }}
