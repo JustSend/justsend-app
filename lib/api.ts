@@ -1,7 +1,11 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { auth } from '@/firebaseConfig';
+import { Platform } from 'react-native';
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_API_URL || 'put variable in .env';
+const BACKEND_URL =
+  Platform.OS === 'android'
+    ? process.env.EXPO_PUBLIC_ANDROID_URL
+    : process.env.EXPO_PUBLIC_WEB_URL;
 
 export const apiPublic = axios.create({
   baseURL: BACKEND_URL,
