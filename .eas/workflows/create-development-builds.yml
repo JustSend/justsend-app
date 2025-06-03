@@ -10,5 +10,5 @@ jobs:
     name: Build Android
     type: build
     params:
-      plataform: android
+      platform: android
       profile: development
