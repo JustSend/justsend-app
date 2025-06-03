@@ -1,16 +1,20 @@
 import { Platform } from 'react-native';
 
 export const Colors = {
-  primary: '#2563eb',
-  secondary: '#3b82f6',
-  lightGray: '#F2F2F2',
+  primary: '#009EE3',
+  secondary: '#003087',
+  accent: '#FFB800',
+  lightGray: '#F7F9FC',
   gray: '#6B7280',
   muted: '#9CA3AF',
   white: '#FFFFFF',
-  black: '#000000',
+  black: '#1A1F36',
   error: '#DC2626',
-  income: '#34D399',
-  expense: '#F87171',
+  success: '#059669',
+  warning: '#D97706',
+  background: '#F7F9FC',
+  card: '#FFFFFF',
+  border: '#E5E7EB',
 };
 
 export const FontSizes = {
@@ -39,25 +43,25 @@ export const FontFamily = Platform.select({
 export const Typography = {
   heading1: {
     fontSize: FontSizes.xxl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: Colors.black,
     fontFamily: FontFamily,
   },
   heading2: {
     fontSize: FontSizes.xl,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: Colors.black,
     fontFamily: FontFamily,
   },
   subtitle: {
     fontSize: FontSizes.medium,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     color: Colors.gray,
     fontFamily: FontFamily,
   },
   body: {
     fontSize: FontSizes.base,
-    fontWeight: '400',
+    fontWeight: '400' as const,
     color: Colors.gray,
     fontFamily: FontFamily,
   },
@@ -68,7 +72,7 @@ export const Typography = {
   },
   button: {
     fontSize: FontSizes.medium,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: Colors.white,
     fontFamily: FontFamily,
   },
