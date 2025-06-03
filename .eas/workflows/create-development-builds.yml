@@ -1,0 +1,14 @@
+name: Create Development Builds
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  android_development_build:
+    name: Build Android
+    type: build
+    params:
+      plataform: android
+      profile: development
