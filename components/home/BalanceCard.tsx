@@ -20,7 +20,13 @@ export const BalanceCard = ({
   selectedCurrency,
   onCurrencyChange,
 }: BalanceCardProps) => {
-  const selectedBalance = balances.find((b) => b.currency === selectedCurrency);
+  const selectedBalance = balances.find(
+    (b) => b.currency === selectedCurrency
+  ) || {
+    currency: selectedCurrency,
+    amount: 0,
+    symbol: '$',
+  };
   const selectedCurrencyData = currencies.find(
     (c) => c.code === selectedCurrency
   );
@@ -43,8 +49,8 @@ export const BalanceCard = ({
 
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <Text style={styles.value}>
-          {selectedBalance?.symbol}
-          {selectedBalance?.amount.toLocaleString('en-US', {
+          {selectedBalance.symbol}
+          {selectedBalance.amount.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}

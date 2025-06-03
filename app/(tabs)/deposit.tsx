@@ -5,12 +5,15 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
-import { currencies } from '@/lib/mockdata';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { currencies } from '@/lib/currency';
+import { useDeposit } from '@/hook/useDeposit';
+import Toast from 'react-native-toast-message';
 
 const METHOD_CARD = 'card';
 const METHOD_BANK = 'bank';
@@ -24,6 +27,37 @@ export default function DepositScreen() {
   const [cardCvv, setCardCvv] = useState('');
   const [bankAccount, setBankAccount] = useState('');
   const [bankRouting, setBankRouting] = useState('');
+  const { deposit, loading, error } = useDeposit();
+
+  const handleDeposit = async () => {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      Alert.alert('Invalid Amount', 'Please enter a valid amount');
+      return;
+    }
+
+    const success = await deposit({
+      currency: selectedCurrency,
+      amount: Number(amount),
+    });
+
+    if (success) {
+      Toast.show({
+        type: 'success',
+        text1: 'Deposit Successful',
+        text2: `${selectedCurrency} ${Number(amount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} has been added to your wallet`,
+        position: 'top',
+        visibilityTime: 4000,
+      });
+
+      router.replace({
+        pathname: '/',
+        params: { selectedCurrency },
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -41,6 +75,7 @@ export default function DepositScreen() {
       </TouchableOpacity>
       <View style={styles.card}>
         <Text style={styles.title}>Deposit Funds</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
         <View style={styles.methodSelectorWrapper}>
           <TouchableOpacity
             style={[
@@ -142,7 +177,6 @@ export default function DepositScreen() {
             />
           </>
         )}
-        {/* Amount and Currency side by side */}
         <View style={styles.amountCurrencyRow}>
           <View style={{ flex: 2, marginRight: Spacing.md }}>
             <Text style={styles.label}>Amount</Text>
@@ -163,8 +197,14 @@ export default function DepositScreen() {
             />
           </View>
         </View>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Deposit</Text>
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleDeposit}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Processing...' : 'Deposit'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -293,5 +333,13 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'flex-end',
     marginTop: Spacing.lg,
+  },
+  errorText: {
+    color: Colors.error,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
   },
 });

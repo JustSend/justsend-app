@@ -1,20 +1,29 @@
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Text } from 'react-native';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
-import { router } from 'expo-router';
-import { balances, currencies } from '@/lib/mockdata';
+import { router, useLocalSearchParams } from 'expo-router';
+import { currencies } from '@/lib/currency';
 import { Colors, Spacing } from '@/styles/theme';
 import { Header } from '@/components/home/Header';
 import { BalanceCard } from '@/components/home/BalanceCard';
 import { QuickActions } from '@/components/home/QuickActions';
 import { TransactionList } from '@/components/home/TransactionList';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useBalances } from '@/hook/useBalances';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const params = useLocalSearchParams();
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const { balances, loading, error } = useBalances();
+
+  useEffect(() => {
+    if (params.selectedCurrency) {
+      setSelectedCurrency(params.selectedCurrency as string);
+    }
+  }, [params.selectedCurrency]);
 
   const handleSignOut = async () => {
     try {
@@ -34,12 +43,25 @@ export default function HomeScreen() {
       >
         <Header email={user?.email} onSignOut={handleSignOut} />
         <View style={styles.content}>
-          <BalanceCard
-            balances={balances}
-            currencies={currencies}
-            selectedCurrency={selectedCurrency}
-            onCurrencyChange={setSelectedCurrency}
-          />
+          {loading ? (
+            <BalanceCard
+              balances={[]}
+              currencies={currencies}
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={setSelectedCurrency}
+            />
+          ) : error ? (
+            <View style={{ padding: 24 }}>
+              <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
+            </View>
+          ) : (
+            <BalanceCard
+              balances={balances}
+              currencies={currencies}
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={setSelectedCurrency}
+            />
+          )}
           <QuickActions />
           <TransactionList transactions={[]} />
         </View>

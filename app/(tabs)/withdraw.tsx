@@ -8,9 +8,9 @@ import {
 import { useState } from 'react';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
-import { currencies } from '@/lib/mockdata';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { currencies } from '@/lib/currency';
 
 export default function WithdrawScreen() {
   const [amount, setAmount] = useState('');
