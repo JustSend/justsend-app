@@ -1,24 +1,29 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing } from '@/styles/theme';
+import { router } from 'expo-router';
 
-interface QuickAction {
-  title: string;
-  icon: string;
-  color: string;
-  onPress: () => void;
-}
+const quickActions = [
+  {
+    title: 'Deposit',
+    icon: 'add-circle-outline',
+    color: Colors.success,
+    onPress: () => router.push('/deposit'),
+  },
+  {
+    title: 'Withdraw',
+    icon: 'remove-circle-outline',
+    color: Colors.primary,
+    onPress: () => router.push('/withdraw'),
+  },
+];
 
-interface QuickActionsProps {
-  actions: QuickAction[];
-}
-
-export const QuickActions = ({ actions }: QuickActionsProps) => {
+export const QuickActions = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Quick Actions</Text>
       <View style={styles.grid}>
-        {actions.map((action, index) => (
+        {quickActions.map((action, index) => (
           <TouchableOpacity
             key={index}
             onPress={action.onPress}

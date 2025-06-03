@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing } from '@/styles/theme';
@@ -26,10 +28,49 @@ export const CurrencySelector = ({
   onSelect,
 }: CurrencySelectorProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const selectedCurrencyData = currencies.find(
     (c) => c.code === selectedCurrency
   );
+
+  useEffect(() => {
+    if (isModalVisible) {
+      if (isDesktop) {
+        fadeAnim.setValue(0);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        slideAnim.setValue(300);
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }).start();
+      }
+    }
+  }, [isModalVisible, fadeAnim, slideAnim]);
+
+  const handleClose = () => {
+    if (isDesktop) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setIsModalVisible(false));
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: 300,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setIsModalVisible(false));
+    }
+  };
 
   return (
     <>
@@ -47,7 +88,7 @@ export const CurrencySelector = ({
         visible={isModalVisible}
         transparent
         animationType="none"
-        onRequestClose={() => setIsModalVisible(false)}
+        onRequestClose={handleClose}
       >
         <View
           style={[
@@ -55,53 +96,99 @@ export const CurrencySelector = ({
             isDesktop ? styles.modalOverlayDesktop : styles.modalOverlayMobile,
           ]}
         >
-          <View
-            style={[
-              styles.modalContent,
-              isDesktop
-                ? styles.modalContentDesktop
-                : styles.modalContentMobile,
-            ]}
-          >
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Currency</Text>
-              <TouchableOpacity
-                onPress={() => setIsModalVisible(false)}
-                style={styles.closeButton}
-              >
-                <Ionicons name="close" size={24} color={Colors.gray} />
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={currencies}
-              keyExtractor={(item) => item.code}
-              renderItem={({ item }) => (
+          {isDesktop ? (
+            <Animated.View
+              style={[
+                styles.modalContent,
+                styles.modalContentDesktop,
+                { opacity: fadeAnim },
+              ]}
+            >
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Select Currency</Text>
                 <TouchableOpacity
-                  style={[
-                    styles.currencyItem,
-                    item.code === selectedCurrency && styles.selectedItem,
-                  ]}
-                  onPress={() => {
-                    onSelect(item.code);
-                    setIsModalVisible(false);
-                  }}
+                  onPress={handleClose}
+                  style={styles.closeButton}
                 >
-                  <View style={styles.currencyInfo}>
-                    <Text style={styles.currencyCode}>{item.code}</Text>
-                    <Text style={styles.currencyName}>{item.name}</Text>
-                  </View>
-                  {item.code === selectedCurrency && (
-                    <Ionicons
-                      name="checkmark"
-                      size={24}
-                      color={Colors.primary}
-                    />
-                  )}
+                  <Ionicons name="close" size={24} color={Colors.gray} />
                 </TouchableOpacity>
-              )}
-            />
-          </View>
+              </View>
+              <FlatList
+                data={currencies}
+                keyExtractor={(item) => item.code}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.currencyItem,
+                      item.code === selectedCurrency && styles.selectedItem,
+                    ]}
+                    onPress={() => {
+                      onSelect(item.code);
+                      handleClose();
+                    }}
+                  >
+                    <View style={styles.currencyInfo}>
+                      <Text style={styles.currencyCode}>{item.code}</Text>
+                      <Text style={styles.currencyName}>{item.name}</Text>
+                    </View>
+                    {item.code === selectedCurrency && (
+                      <Ionicons
+                        name="checkmark"
+                        size={24}
+                        color={Colors.primary}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+              />
+            </Animated.View>
+          ) : (
+            <Animated.View
+              style={[
+                styles.modalContent,
+                styles.modalContentMobile,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Select Currency</Text>
+                <TouchableOpacity
+                  onPress={handleClose}
+                  style={styles.closeButton}
+                >
+                  <Ionicons name="close" size={24} color={Colors.gray} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={currencies}
+                keyExtractor={(item) => item.code}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.currencyItem,
+                      item.code === selectedCurrency && styles.selectedItem,
+                    ]}
+                    onPress={() => {
+                      onSelect(item.code);
+                      handleClose();
+                    }}
+                  >
+                    <View style={styles.currencyInfo}>
+                      <Text style={styles.currencyCode}>{item.code}</Text>
+                      <Text style={styles.currencyName}>{item.name}</Text>
+                    </View>
+                    {item.code === selectedCurrency && (
+                      <Ionicons
+                        name="checkmark"
+                        size={24}
+                        color={Colors.primary}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+              />
+            </Animated.View>
+          )}
         </View>
       </Modal>
     </>

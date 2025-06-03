@@ -5,7 +5,6 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
   TouchableOpacity,
   Keyboard,
 } from 'react-native';
@@ -107,13 +106,3 @@ export default function Login() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-    color: Colors.primary,
-  },
-});

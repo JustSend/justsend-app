@@ -40,18 +40,6 @@ export const BalanceCard = ({
           maximumFractionDigits: 2,
         })}
       </Text>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>+$1,234</Text>
-          <Text style={styles.statLabel}>Income</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>-$567</Text>
-          <Text style={styles.statLabel}>Expenses</Text>
-        </View>
-      </View>
     </View>
   );
 };

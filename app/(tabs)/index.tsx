@@ -3,13 +3,14 @@ import { useAuth } from '@/components/AuthProvider';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/firebaseConfig';
 import { router } from 'expo-router';
-import { balances, currencies, mockTransactions } from '@/lib/mockdata';
+import { balances, currencies } from '@/lib/mockdata';
 import { Colors, Spacing } from '@/styles/theme';
 import { Header } from '@/components/home/Header';
 import { BalanceCard } from '@/components/home/BalanceCard';
 import { QuickActions } from '@/components/home/QuickActions';
 import { TransactionList } from '@/components/home/TransactionList';
 import { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -24,47 +25,30 @@ export default function HomeScreen() {
     }
   };
 
-  const quickActions = [
-    {
-      title: 'Send Money',
-      icon: 'send-outline',
-      color: Colors.primary,
-      onPress: () => {},
-    },
-    {
-      title: 'Request Money',
-      icon: 'download-outline',
-      color: Colors.success,
-      onPress: () => {},
-    },
-    {
-      title: 'Pay Bills',
-      icon: 'receipt-outline',
-      color: Colors.warning,
-      onPress: () => {},
-    },
-    {
-      title: 'Top Up',
-      icon: 'add-circle-outline',
-      color: Colors.secondary,
-      onPress: () => {},
-    },
-  ];
-
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar
+        style="light"
+        backgroundColor={Colors.primary}
+        translucent={false}
+      />
       <Header email={user?.email} onSignOut={handleSignOut} />
-      <View style={styles.content}>
-        <BalanceCard
-          balances={balances}
-          currencies={currencies}
-          selectedCurrency={selectedCurrency}
-          onCurrencyChange={setSelectedCurrency}
-        />
-        <QuickActions actions={quickActions} />
-        <TransactionList transactions={mockTransactions} />
-      </View>
-    </ScrollView>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.content}>
+          <BalanceCard
+            balances={balances}
+            currencies={currencies}
+            selectedCurrency={selectedCurrency}
+            onCurrencyChange={setSelectedCurrency}
+          />
+          <QuickActions />
+          <TransactionList transactions={[]} />
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -72,6 +56,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   content: {
     padding: Spacing.lg,

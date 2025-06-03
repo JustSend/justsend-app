@@ -18,7 +18,7 @@ export const Header = ({ email, onSignOut }: HeaderProps) => {
             </Text>
           </View>
           <View>
-            <Text style={styles.welcomeText}>Welcome back</Text>
+            <Text style={styles.welcomeText}>Welcome back to JustSend</Text>
             <Text style={styles.emailText}>{email || 'Guest User'}</Text>
           </View>
         </View>
@@ -33,12 +33,11 @@ export const Header = ({ email, onSignOut }: HeaderProps) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.primary,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.lg,
     paddingBottom: Spacing.lg,
     paddingHorizontal: Spacing.lg,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
