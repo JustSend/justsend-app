@@ -21,6 +21,14 @@ export const BalanceCard = ({
   onCurrencyChange,
 }: BalanceCardProps) => {
   const selectedBalance = balances.find((b) => b.currency === selectedCurrency);
+  const selectedCurrencyData = currencies.find(
+    (c) => c.code === selectedCurrency
+  );
+  const pluralCurrencyName = selectedCurrencyData
+    ? selectedCurrencyData.name.endsWith('s')
+      ? selectedCurrencyData.name
+      : selectedCurrencyData.name + 's'
+    : '';
 
   return (
     <View style={styles.container}>
@@ -33,13 +41,18 @@ export const BalanceCard = ({
         />
       </View>
 
-      <Text style={styles.value}>
-        {selectedBalance?.symbol}
-        {selectedBalance?.amount.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+        <Text style={styles.value}>
+          {selectedBalance?.symbol}
+          {selectedBalance?.amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </Text>
+        {selectedCurrencyData && (
+          <Text style={styles.currencyName}> {pluralCurrencyName}</Text>
+        )}
+      </View>
     </View>
   );
 };
@@ -97,5 +110,10 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.border,
     marginHorizontal: Spacing.md,
+  },
+  currencyName: {
+    ...Typography.subtitle,
+    color: Colors.gray,
+    marginLeft: 6,
   },
 });

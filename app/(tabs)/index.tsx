@@ -27,16 +27,12 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        style="light"
-        backgroundColor={Colors.primary}
-        translucent={false}
-      />
-      <Header email={user?.email} onSignOut={handleSignOut} />
+      <StatusBar style="light" backgroundColor={Colors.primary} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
+        <Header email={user?.email} onSignOut={handleSignOut} />
         <View style={styles.content}>
           <BalanceCard
             balances={balances}
