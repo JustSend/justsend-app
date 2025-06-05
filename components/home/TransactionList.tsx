@@ -7,7 +7,18 @@ interface TransactionListProps {
   transactions: Transaction[];
 }
 
-export const TransactionList = ({ transactions }: TransactionListProps) => {
+export const TransactionList = ({
+  transactions = [],
+}: TransactionListProps) => {
+  if (!transactions) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Recent Transactions</Text>
+        <Text style={{ color: Colors.gray }}>No Transactions</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recent Transactions</Text>

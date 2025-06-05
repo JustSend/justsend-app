@@ -19,7 +19,7 @@ export default function HomeScreen() {
   const params = useLocalSearchParams();
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const { balances, loading, error } = useBalances();
-  const useTransactionsResult = useTransactions();
+  const { transactions } = useTransactions();
 
   useEffect(() => {
     if (params.selectedCurrency) {
@@ -65,7 +65,7 @@ export default function HomeScreen() {
             />
           )}
           <QuickActions />
-          <TransactionList transactions={useTransactionsResult.transactions} />
+          <TransactionList transactions={transactions} />
         </View>
       </ScrollView>
     </View>
