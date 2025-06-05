@@ -12,12 +12,14 @@ import { TransactionList } from '@/components/home/TransactionList';
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useBalances } from '@/hook/useBalances';
+import useTransactions from '@/hook/useTransactions';
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams();
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const { balances, loading, error } = useBalances();
+  const useTransactionsResult = useTransactions();
 
   useEffect(() => {
     if (params.selectedCurrency) {
@@ -63,7 +65,7 @@ export default function HomeScreen() {
             />
           )}
           <QuickActions />
-          <TransactionList transactions={[]} />
+          <TransactionList transactions={useTransactionsResult.transactions} />
         </View>
       </ScrollView>
     </View>
