@@ -6,19 +6,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import { useDeposit } from '@/hook/useDeposit';
-import { useCardValidation } from '@/hook/useCardValidation';
 import Toast from 'react-native-toast-message';
 import { CardForm } from '@/components/deposit/CardForm';
 import { BankForm } from '@/components/deposit/BankForm';
 import { depositStyles } from '@/styles/deposit';
 
-const METHOD_CARD = 'card';
-const METHOD_BANK = 'bank';
+const METHOD_CARD = 'card' as const;
+const METHOD_BANK = 'bank' as const;
 
 export default function DepositScreen() {
   const [amount, setAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [method, setMethod] = useState(METHOD_CARD);
+  const [method, setMethod] = useState<'card' | 'bank'>(METHOD_CARD);
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
@@ -27,12 +26,7 @@ export default function DepositScreen() {
   const [showCardErrors, setShowCardErrors] = useState(false);
   const [showBankErrors, setShowBankErrors] = useState(false);
   const [showAmountError, setShowAmountError] = useState(false);
-  const {
-    deposit,
-    loading: depositLoading,
-    error: depositError,
-  } = useDeposit();
-  const { validateCard, loading: validationLoading } = useCardValidation();
+  const { deposit, loading, error } = useDeposit();
 
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
@@ -82,7 +76,6 @@ export default function DepositScreen() {
     setShowAmountError(false);
 
     let hasErrors = false;
-    let paymentToken: string | undefined;
 
     if (!amount || isNaN(Number(amount))) {
       setShowAmountError(true);
@@ -105,46 +98,6 @@ export default function DepositScreen() {
       } else if (cardCvv.length < 3) {
         setShowCardErrors(true);
         hasErrors = true;
-      } else {
-        const validationResult = await validateCard({
-          cardNumber,
-          expirationDate: cardExpiry,
-          secureDigits: cardCvv,
-        });
-
-        if (!validationResult.valid) {
-          setShowCardErrors(true);
-          hasErrors = true;
-          Toast.show({
-            type: 'error',
-            text1: 'Deposit Failed',
-            text2: validationResult.message,
-            position: 'top',
-            visibilityTime: 4000,
-            autoHide: true,
-            topOffset: 50,
-            bottomOffset: 40,
-            props: {
-              style: {
-                backgroundColor: Colors.error,
-                borderRadius: 12,
-                padding: 16,
-              },
-              text1Style: {
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: Colors.white,
-              },
-              text2Style: {
-                fontSize: 14,
-                color: Colors.white,
-                marginTop: 4,
-              },
-            },
-          });
-        } else {
-          paymentToken = validationResult.token;
-        }
       }
     } else if (method === METHOD_BANK) {
       if (!bankAccount || !bankRouting) {
@@ -163,13 +116,25 @@ export default function DepositScreen() {
       return;
     }
 
-    const success = await deposit({
+    const depositResult = await deposit({
       currency: selectedCurrency,
       amount: Number(amount),
-      token: paymentToken,
+      method,
+      ...(method === METHOD_CARD
+        ? {
+            cardNumber,
+            expirationDate: cardExpiry,
+            secureDigits: cardCvv,
+          }
+        : {
+            bankAccount,
+            bankRouting,
+          }),
     });
 
-    if (success) {
+    console.log('result', depositResult);
+
+    if (depositResult.valid) {
       Toast.show({
         type: 'success',
         text1: 'Deposit Successful! 🎉',
@@ -207,11 +172,11 @@ export default function DepositScreen() {
         pathname: '/',
         params: { selectedCurrency },
       });
-    } else if (depositError) {
+    } else {
       Toast.show({
         type: 'error',
         text1: 'Deposit Failed',
-        text2: depositError,
+        text2: depositResult?.message || error || 'Failed to process deposit',
         position: 'top',
         visibilityTime: 4000,
         autoHide: true,
@@ -237,8 +202,6 @@ export default function DepositScreen() {
       });
     }
   };
-
-  const loading = depositLoading || validationLoading;
 
   const getInputStyle = (hasError: boolean) => [
     depositStyles.input,
