@@ -92,37 +92,36 @@ export default function DepositScreen() {
     }
 
     if (hasErrors) {
-      const errorMessages = [amountError, cardError, bankError, validationError]
-        .filter(Boolean)
-        .join('\n• ');
-
-      Toast.show({
-        type: 'error',
-        text1: 'Deposit Failed',
-        text2: `• ${errorMessages}`,
-        position: 'top',
-        visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
-        bottomOffset: 40,
-        props: {
-          style: {
-            backgroundColor: Colors.error,
-            borderRadius: 12,
-            padding: 16,
+      const errorMessage = validationError || cardError;
+      if (errorMessage) {
+        Toast.show({
+          type: 'error',
+          text1: 'Deposit Failed',
+          text2: errorMessage,
+          position: 'top',
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
+          bottomOffset: 40,
+          props: {
+            style: {
+              backgroundColor: Colors.error,
+              borderRadius: 12,
+              padding: 16,
+            },
+            text1Style: {
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: Colors.white,
+            },
+            text2Style: {
+              fontSize: 14,
+              color: Colors.white,
+              marginTop: 4,
+            },
           },
-          text1Style: {
-            fontSize: 16,
-            fontWeight: 'bold',
-            color: Colors.white,
-          },
-          text2Style: {
-            fontSize: 14,
-            color: Colors.white,
-            marginTop: 4,
-          },
-        },
-      });
+        });
+      }
       return;
     }
 
