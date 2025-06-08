@@ -19,7 +19,11 @@ export default function useTransactions(): UseTransactionsResult {
     setError(null);
     try {
       const data = await getWalletTransactions();
-      setTransactions(data);
+      const sortedData = data.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setTransactions(sortedData);
     } catch (err: any) {
       setError(err);
     } finally {
