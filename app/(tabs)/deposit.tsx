@@ -32,11 +32,7 @@ export default function DepositScreen() {
     loading: depositLoading,
     error: depositError,
   } = useDeposit();
-  const {
-    validateCard,
-    loading: validationLoading,
-    error: validationError,
-  } = useCardValidation();
+  const { validateCard, loading: validationLoading } = useCardValidation();
 
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
