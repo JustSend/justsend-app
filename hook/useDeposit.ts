@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { apiPrivate } from '@/lib/api';
 
 interface DepositParams {
+  token?: string;
   currency: string;
   amount: number;
 }

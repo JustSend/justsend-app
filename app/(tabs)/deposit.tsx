@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
@@ -13,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import { useDeposit } from '@/hook/useDeposit';
+import { useCardValidation } from '@/hook/useCardValidation';
 import Toast from 'react-native-toast-message';
 
 const METHOD_CARD = 'card';
@@ -27,37 +27,187 @@ export default function DepositScreen() {
   const [cardCvv, setCardCvv] = useState('');
   const [bankAccount, setBankAccount] = useState('');
   const [bankRouting, setBankRouting] = useState('');
-  const { deposit, loading, error } = useDeposit();
+  const [cardError, setCardError] = useState('');
+  const [bankError, setBankError] = useState('');
+  const [amountError, setAmountError] = useState('');
+  const [showCardErrors, setShowCardErrors] = useState(false);
+  const [showBankErrors, setShowBankErrors] = useState(false);
+  const [showAmountError, setShowAmountError] = useState(false);
+  const {
+    deposit,
+    loading: depositLoading,
+    error: depositError,
+  } = useDeposit();
+  const {
+    validateCard,
+    loading: validationLoading,
+    error: validationError,
+  } = useCardValidation();
 
   const handleDeposit = async () => {
+    // Reset errors
+    setCardError('');
+    setBankError('');
+    setAmountError('');
+    setShowCardErrors(false);
+    setShowBankErrors(false);
+    setShowAmountError(false);
+
+    let hasErrors = false;
+    let paymentToken: string | undefined;
+
+    // Validate amount
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid amount');
+      setAmountError('Please enter a valid amount');
+      setShowAmountError(true);
+      hasErrors = true;
+    }
+
+    if (method === METHOD_CARD) {
+      if (!cardNumber || !cardExpiry || !cardCvv) {
+        setCardError('Please fill in all card details');
+        setShowCardErrors(true);
+        hasErrors = true;
+      } else {
+        const validationResult = await validateCard({
+          cardNumber,
+          expirationDate: cardExpiry,
+          secureDigits: cardCvv,
+        });
+
+        if (!validationResult.valid) {
+          setCardError(validationResult.message);
+          setShowCardErrors(true);
+          hasErrors = true;
+        } else {
+          paymentToken = validationResult.token;
+        }
+      }
+    } else if (method === METHOD_BANK) {
+      if (!bankAccount || !bankRouting) {
+        setBankError('Please fill in all bank account details');
+        setShowBankErrors(true);
+        hasErrors = true;
+      }
+    }
+
+    if (hasErrors) {
+      const errorMessages = [amountError, cardError, bankError, validationError]
+        .filter(Boolean)
+        .join('\n• ');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Deposit Failed',
+        text2: `• ${errorMessages}`,
+        position: 'top',
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+        bottomOffset: 40,
+        props: {
+          style: {
+            backgroundColor: Colors.error,
+            borderRadius: 12,
+            padding: 16,
+          },
+          text1Style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: Colors.white,
+          },
+          text2Style: {
+            fontSize: 14,
+            color: Colors.white,
+            marginTop: 4,
+          },
+        },
+      });
       return;
     }
 
     const success = await deposit({
       currency: selectedCurrency,
       amount: Number(amount),
+      token: paymentToken,
     });
 
     if (success) {
       Toast.show({
         type: 'success',
-        text1: 'Deposit Successful',
-        text2: `${selectedCurrency} ${Number(amount).toLocaleString('en-US', {
+        text1: 'Deposit Successful! 🎉',
+        text2: `Your wallet has been credited with ${selectedCurrency} ${Number(
+          amount
+        ).toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })} has been added to your wallet`,
+        })}`,
         position: 'top',
         visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+        bottomOffset: 40,
+        props: {
+          style: {
+            backgroundColor: Colors.success,
+            borderRadius: 12,
+            padding: 16,
+          },
+          text1Style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: Colors.white,
+          },
+          text2Style: {
+            fontSize: 14,
+            color: Colors.white,
+            marginTop: 4,
+          },
+        },
       });
 
       router.replace({
         pathname: '/',
         params: { selectedCurrency },
       });
+    } else if (depositError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Deposit Failed',
+        text2: depositError,
+        position: 'top',
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+        bottomOffset: 40,
+        props: {
+          style: {
+            backgroundColor: Colors.error,
+            borderRadius: 12,
+            padding: 16,
+          },
+          text1Style: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: Colors.white,
+          },
+          text2Style: {
+            fontSize: 14,
+            color: Colors.white,
+            marginTop: 4,
+          },
+        },
+      });
     }
   };
+
+  const loading = depositLoading || validationLoading;
+  const error = depositError || validationError;
+
+  const getInputStyle = (hasError: boolean) => [
+    styles.input,
+    hasError && styles.inputError,
+  ];
 
   return (
     <View style={styles.container}>
@@ -75,7 +225,6 @@ export default function DepositScreen() {
       </TouchableOpacity>
       <View style={styles.card}>
         <Text style={styles.title}>Deposit Funds</Text>
-        {error && <Text style={styles.errorText}>{error}</Text>}
         <View style={styles.methodSelectorWrapper}>
           <TouchableOpacity
             style={[
@@ -120,37 +269,53 @@ export default function DepositScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
         {method === METHOD_CARD && (
           <>
             <Text style={styles.label}>Card Number</Text>
             <TextInput
-              style={styles.input}
+              style={getInputStyle(showCardErrors && !cardNumber)}
               placeholder="1234 5678 9012 3456"
+              placeholderTextColor={Colors.gray}
               keyboardType="numeric"
               value={cardNumber}
-              onChangeText={setCardNumber}
+              onChangeText={(text) => {
+                setCardNumber(text);
+                setCardError('');
+                setShowCardErrors(false);
+              }}
               maxLength={19}
             />
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: Spacing.md }}>
                 <Text style={styles.label}>Expiry</Text>
                 <TextInput
-                  style={styles.input}
+                  style={getInputStyle(showCardErrors && !cardExpiry)}
                   placeholder="MM/YY"
+                  placeholderTextColor={Colors.gray}
                   keyboardType="numeric"
                   value={cardExpiry}
-                  onChangeText={setCardExpiry}
+                  onChangeText={(text) => {
+                    setCardExpiry(text);
+                    setCardError('');
+                    setShowCardErrors(false);
+                  }}
                   maxLength={5}
                 />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.label}>CVV</Text>
                 <TextInput
-                  style={styles.input}
+                  style={getInputStyle(showCardErrors && !cardCvv)}
                   placeholder="123"
+                  placeholderTextColor={Colors.gray}
                   keyboardType="numeric"
                   value={cardCvv}
-                  onChangeText={setCardCvv}
+                  onChangeText={(text) => {
+                    setCardCvv(text);
+                    setCardError('');
+                    setShowCardErrors(false);
+                  }}
                   maxLength={4}
                 />
               </View>
@@ -161,19 +326,29 @@ export default function DepositScreen() {
           <>
             <Text style={styles.label}>Account Number</Text>
             <TextInput
-              style={styles.input}
+              style={getInputStyle(showBankErrors && !bankAccount)}
               placeholder="Account Number"
+              placeholderTextColor={Colors.gray}
               keyboardType="numeric"
               value={bankAccount}
-              onChangeText={setBankAccount}
+              onChangeText={(text) => {
+                setBankAccount(text);
+                setBankError('');
+                setShowBankErrors(false);
+              }}
             />
             <Text style={styles.label}>Routing Number</Text>
             <TextInput
-              style={styles.input}
+              style={getInputStyle(showBankErrors && !bankRouting)}
               placeholder="Routing Number"
+              placeholderTextColor={Colors.gray}
               keyboardType="numeric"
               value={bankRouting}
-              onChangeText={setBankRouting}
+              onChangeText={(text) => {
+                setBankRouting(text);
+                setBankError('');
+                setShowBankErrors(false);
+              }}
             />
           </>
         )}
@@ -181,11 +356,16 @@ export default function DepositScreen() {
           <View style={{ flex: 2, marginRight: Spacing.md }}>
             <Text style={styles.label}>Amount</Text>
             <TextInput
-              style={styles.input}
+              style={getInputStyle(showAmountError)}
               placeholder="Enter amount"
+              placeholderTextColor={Colors.gray}
               keyboardType="numeric"
               value={amount}
-              onChangeText={setAmount}
+              onChangeText={(text) => {
+                setAmount(text);
+                setAmountError('');
+                setShowAmountError(false);
+              }}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -334,10 +514,35 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     marginTop: Spacing.lg,
   },
-  errorText: {
+  errorBanner: {
+    backgroundColor: Colors.error,
+    borderRadius: 12,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  errorIcon: {
+    marginRight: Spacing.sm,
+    marginTop: 2,
+  },
+  errorContent: {
+    flex: 1,
+  },
+  errorBannerText: {
+    color: Colors.white,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  errorMessage: {
+    ...Typography.body,
     color: Colors.error,
-    textAlign: 'center',
-    marginBottom: Spacing.md,
+    flex: 1,
+  },
+  inputError: {
+    borderColor: Colors.error,
+    borderWidth: 1,
   },
   buttonDisabled: {
     opacity: 0.7,
