@@ -54,7 +54,7 @@ export default function DepositScreen() {
       bankRouting,
     });
 
-    if (depositResult.valid) {
+    if (depositResult.success) {
       Toast.show({
         type: 'success',
         text1: 'DEBIN Deposit Successful! 🎉',
