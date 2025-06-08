@@ -7,63 +7,15 @@ import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import { useDeposit } from '@/hook/useDeposit';
 import Toast from 'react-native-toast-message';
-import { CardForm } from '@/components/deposit/CardForm';
-import { BankForm } from '@/components/deposit/BankForm';
 import { depositStyles } from '@/styles/deposit';
-
-const METHOD_CARD = 'card' as const;
-const METHOD_BANK = 'bank' as const;
 
 export default function DepositScreen() {
   const [amount, setAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [method, setMethod] = useState<'card' | 'bank'>(METHOD_CARD);
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [bankAccount, setBankAccount] = useState('');
   const [bankRouting, setBankRouting] = useState('');
-  const [showCardErrors, setShowCardErrors] = useState(false);
   const [showBankErrors, setShowBankErrors] = useState(false);
   const [showAmountError, setShowAmountError] = useState(false);
   const { deposit, loading, error } = useDeposit();
-
-  const formatCardNumber = (text: string) => {
-    const cleaned = text.replace(/\D/g, '');
-    const formatted = cleaned.replace(/(\d{4})(?=\d)/g, '$1 ');
-    return formatted;
-  };
-
-  const formatExpiry = (text: string) => {
-    const cleaned = text.replace(/\D/g, '');
-    if (cleaned.length >= 2) {
-      return `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
-    }
-    return cleaned;
-  };
-
-  const handleCardNumberChange = (text: string) => {
-    const formatted = formatCardNumber(text);
-    setCardNumber(formatted);
-    setShowCardErrors(false);
-  };
-
-  const handleExpiryChange = (text: string) => {
-    const formatted = formatExpiry(text);
-    setCardExpiry(formatted);
-    setShowCardErrors(false);
-  };
-
-  const handleCvvChange = (text: string) => {
-    const cleaned = text.replace(/\D/g, '').slice(0, 3);
-    setCardCvv(cleaned);
-    setShowCardErrors(false);
-  };
-
-  const handleBankAccountChange = (text: string) => {
-    setBankAccount(text);
-    setShowBankErrors(false);
-  };
 
   const handleBankRoutingChange = (text: string) => {
     setBankRouting(text);
@@ -71,7 +23,6 @@ export default function DepositScreen() {
   };
 
   const handleDeposit = async () => {
-    setShowCardErrors(false);
     setShowBankErrors(false);
     setShowAmountError(false);
 
@@ -85,31 +36,12 @@ export default function DepositScreen() {
       hasErrors = true;
     }
 
-    if (method === METHOD_CARD) {
-      if (!cardNumber || !cardExpiry || !cardCvv) {
-        setShowCardErrors(true);
-        hasErrors = true;
-      } else if (cardNumber.replace(/\s/g, '').length < 16) {
-        setShowCardErrors(true);
-        hasErrors = true;
-      } else if (cardExpiry.length < 5) {
-        setShowCardErrors(true);
-        hasErrors = true;
-      } else if (cardCvv.length < 3) {
-        setShowCardErrors(true);
-        hasErrors = true;
-      }
-    } else if (method === METHOD_BANK) {
-      if (!bankAccount || !bankRouting) {
-        setShowBankErrors(true);
-        hasErrors = true;
-      } else if (bankAccount.length < 8) {
-        setShowBankErrors(true);
-        hasErrors = true;
-      } else if (bankRouting.length !== 9) {
-        setShowBankErrors(true);
-        hasErrors = true;
-      }
+    if (!bankRouting) {
+      setShowBankErrors(true);
+      hasErrors = true;
+    } else if (bankRouting.length !== 9) {
+      setShowBankErrors(true);
+      hasErrors = true;
     }
 
     if (hasErrors) {
@@ -119,25 +51,13 @@ export default function DepositScreen() {
     const depositResult = await deposit({
       currency: selectedCurrency,
       amount: Number(amount),
-      method,
-      ...(method === METHOD_CARD
-        ? {
-            cardNumber,
-            expirationDate: cardExpiry,
-            secureDigits: cardCvv,
-          }
-        : {
-            bankAccount,
-            bankRouting,
-          }),
+      bankRouting,
     });
-
-    console.log('result', depositResult);
 
     if (depositResult.valid) {
       Toast.show({
         type: 'success',
-        text1: 'Deposit Successful! 🎉',
+        text1: 'DEBIN Deposit Successful! 🎉',
         text2: `Your wallet has been credited with ${selectedCurrency} ${Number(
           amount
         ).toLocaleString('en-US', {
@@ -175,8 +95,9 @@ export default function DepositScreen() {
     } else {
       Toast.show({
         type: 'error',
-        text1: 'Deposit Failed',
-        text2: depositResult?.message || error || 'Failed to process deposit',
+        text1: 'DEBIN Deposit Failed',
+        text2:
+          depositResult?.message || error || 'Failed to process DEBIN deposit',
         position: 'top',
         visibilityTime: 4000,
         autoHide: true,
@@ -223,73 +144,44 @@ export default function DepositScreen() {
         <Ionicons name="chevron-back" size={24} color={Colors.primary} />
       </TouchableOpacity>
       <View style={depositStyles.card}>
-        <Text style={depositStyles.title}>Deposit Funds</Text>
-        <View style={depositStyles.methodSelectorWrapper}>
-          <TouchableOpacity
-            style={[
-              depositStyles.methodButton,
-              method === METHOD_CARD && depositStyles.methodButtonActive,
-            ]}
-            onPress={() => setMethod(METHOD_CARD)}
-          >
-            <Ionicons
-              name="card-outline"
-              size={20}
-              color={method === METHOD_CARD ? Colors.primary : Colors.gray}
-            />
-            <Text
-              style={[
-                depositStyles.methodButtonText,
-                method === METHOD_CARD && depositStyles.methodButtonTextActive,
-              ]}
-            >
-              Card
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              depositStyles.methodButton,
-              method === METHOD_BANK && depositStyles.methodButtonActive,
-            ]}
-            onPress={() => setMethod(METHOD_BANK)}
-          >
-            <Ionicons
-              name="business-outline"
-              size={20}
-              color={method === METHOD_BANK ? Colors.primary : Colors.gray}
-            />
-            <Text
-              style={[
-                depositStyles.methodButtonText,
-                method === METHOD_BANK && depositStyles.methodButtonTextActive,
-              ]}
-            >
-              Bank Account
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={depositStyles.title}>DEBIN Deposit</Text>
+        <Text
+          style={[
+            Typography.subtitle,
+            {
+              color: Colors.gray,
+              marginBottom: Spacing.lg,
+              textAlign: 'center',
+            },
+          ]}
+        >
+          Enter your routing number for an immediate deposit
+        </Text>
 
-        {method === METHOD_CARD ? (
-          <CardForm
-            cardNumber={cardNumber}
-            cardExpiry={cardExpiry}
-            cardCvv={cardCvv}
-            showErrors={showCardErrors}
-            onCardNumberChange={handleCardNumberChange}
-            onExpiryChange={handleExpiryChange}
-            onCvvChange={handleCvvChange}
-            getInputStyle={getInputStyle}
-          />
-        ) : (
-          <BankForm
-            bankAccount={bankAccount}
-            bankRouting={bankRouting}
-            showErrors={showBankErrors}
-            onBankAccountChange={handleBankAccountChange}
-            onBankRoutingChange={handleBankRoutingChange}
-            getInputStyle={getInputStyle}
-          />
-        )}
+        <Text
+          style={[
+            Typography.subtitle,
+            {
+              color: Colors.gray,
+              marginBottom: Spacing.xs,
+              marginTop: Spacing.lg,
+              alignSelf: 'flex-start',
+            },
+          ]}
+        >
+          Routing Number
+        </Text>
+        <TextInput
+          style={getInputStyle(
+            showBankErrors && (!bankRouting || bankRouting.length !== 9)
+          )}
+          placeholder="Enter routing number"
+          placeholderTextColor={Colors.gray}
+          keyboardType="numeric"
+          value={bankRouting}
+          onChangeText={handleBankRoutingChange}
+          maxLength={9}
+        />
 
         <View style={depositStyles.amountCurrencyRow}>
           <View style={{ flex: 2, marginRight: Spacing.md }}>
@@ -344,7 +236,7 @@ export default function DepositScreen() {
           disabled={loading}
         >
           <Text style={depositStyles.buttonText}>
-            {loading ? 'Processing...' : 'Deposit'}
+            {loading ? 'Processing...' : 'Deposit with DEBIN'}
           </Text>
         </TouchableOpacity>
       </View>

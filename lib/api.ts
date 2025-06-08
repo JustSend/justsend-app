@@ -11,10 +11,6 @@ export const apiPublic = axios.create({
   baseURL: BACKEND_URL,
 });
 
-export const apiExternal = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_EXTERNAL_URL,
-});
-
 export const apiPrivate = axios.create({
   baseURL: BACKEND_URL,
 });
