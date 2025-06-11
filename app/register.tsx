@@ -54,7 +54,7 @@ export default function Register() {
         uid: userCredential.user.uid,
         email: email,
       };
-      await apiPublic.post(`/user`, user);
+      await apiPublic.post(`/api/user`, user);
       router.navigate('/login');
       Toast.show({
         type: 'success',

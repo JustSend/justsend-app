@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing } from '@/styles/theme';
 import { router } from 'expo-router';
@@ -50,10 +44,11 @@ export const QuickActions = () => {
             onPress={action.onPress}
             onHoverIn={() => setHoveredIndex(index)}
             onHoverOut={() => setHoveredIndex(null)}
-            style={({ hovered }) => [
+            style={[
               styles.actionCard,
               {
-                backgroundColor: hovered ? `${action.color}15` : Colors.white,
+                backgroundColor:
+                  hoveredIndex === index ? `${action.color}15` : Colors.white,
               },
             ]}
           >
