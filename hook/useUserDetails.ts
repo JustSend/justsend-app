@@ -22,7 +22,7 @@ export function useUserDetails() {
       }
 
       try {
-        const userInfo = await apiPrivate.get<user>('/api/wallet/info');
+        const userInfo = await apiPrivate.get<user>('/api/user/me');
         setUserDetails(userInfo.data);
         setError(null);
       } catch (err) {

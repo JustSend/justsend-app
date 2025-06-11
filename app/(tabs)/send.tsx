@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,38 +14,24 @@ import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import Toast from 'react-native-toast-message';
 import { depositStyles } from '@/styles/deposit';
+import { useUserSearch, User } from '@/hook/useUserSearch';
 
 export default function SendScreen() {
   const [amount, setAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [email, setEmail] = useState('');
-  const [showEmailError, setShowEmailError] = useState(false);
   const [showAmountError, setShowAmountError] = useState(false);
+  const { searchTerm, setSearchTerm, results, loading } = useUserSearch();
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const handleSend = async () => {
-    setShowEmailError(false);
+    if (!selectedUser) return;
     setShowAmountError(false);
 
-    let hasErrors = false;
-
-    if (!amount || isNaN(Number(amount))) {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       setShowAmountError(true);
-      hasErrors = true;
-    } else if (Number(amount) <= 0) {
-      setShowAmountError(true);
-      hasErrors = true;
-    }
-
-    if (!email || !email.includes('@')) {
-      setShowEmailError(true);
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
       return;
     }
 
-    // TODO: Implement send logic
     Toast.show({
       type: 'success',
       text1: 'Send Successful! 🎉',
@@ -48,7 +41,7 @@ export default function SendScreen() {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }
-      )} to ${email}`,
+      )} to ${selectedUser.email}`,
       position: 'top',
       visibilityTime: 4000,
       autoHide: true,
@@ -104,20 +97,58 @@ export default function SendScreen() {
             },
           ]}
         >
-          Recipient Email
+          Recipient
         </Text>
-        <TextInput
-          style={getInputStyle(showEmailError)}
-          placeholder="Enter recipient's email"
-          placeholderTextColor={Colors.gray}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            setShowEmailError(false);
-          }}
-        />
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={[depositStyles.input, styles.searchInput]}
+            placeholder="Search by email or alias"
+            placeholderTextColor={Colors.gray}
+            autoCapitalize="none"
+            value={searchTerm}
+            onChangeText={(text) => {
+              setSearchTerm(text);
+              setSelectedUser(null);
+            }}
+          />
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <Text style={[Typography.caption, { color: Colors.gray }]}>
+                Searching...
+              </Text>
+            </View>
+          )}
+          {!selectedUser && results.length > 0 && (
+            <ScrollView style={styles.resultsContainer}>
+              {results.map((user, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.resultItem}
+                  onPress={() => {
+                    setSelectedUser(user);
+                    setSearchTerm(user.email);
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={[Typography.subtitle, { color: Colors.black }]}
+                    >
+                      {user.alias}
+                    </Text>
+                    <Text style={[Typography.caption, { color: Colors.gray }]}>
+                      {user.email}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={Colors.gray}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+        </View>
 
         <View style={depositStyles.amountCurrencyRow}>
           <View style={{ flex: 2, marginRight: Spacing.md }}>
@@ -168,10 +199,54 @@ export default function SendScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={[depositStyles.button]} onPress={handleSend}>
+        <TouchableOpacity
+          style={[depositStyles.button, !selectedUser && styles.buttonDisabled]}
+          onPress={handleSend}
+          disabled={!selectedUser}
+        >
           <Text style={depositStyles.buttonText}>Send Money</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    position: 'relative',
+    zIndex: 1,
+  },
+  searchInput: {
+    marginBottom: 0,
+  },
+  loadingContainer: {
+    padding: Spacing.sm,
+    alignItems: 'center',
+  },
+  resultsContainer: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    maxHeight: 200,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    zIndex: 2,
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.lightGray,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+});
