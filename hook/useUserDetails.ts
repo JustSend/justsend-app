@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { apiPrivate } from '@/lib/api';
-import { user } from '@/lib/user';
+import { User } from '@/lib/user';
 
 interface UserDetails {
   email: string;
@@ -22,7 +22,7 @@ export function useUserDetails() {
       }
 
       try {
-        const userInfo = await apiPrivate.get<user>('/api/user/me');
+        const userInfo = await apiPrivate.get<User>('/api/user/me');
         setUserDetails(userInfo.data);
         setError(null);
       } catch (err) {

@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiPrivate } from '@/lib/api';
 import debounce from 'lodash/debounce';
-import { User } from 'firebase/auth';
+import { User } from '@/lib/user';
+
+type DebouncedFunc = ReturnType<typeof debounce>;
 
 export function useUserSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const debouncedSearchRef = useRef<DebouncedFunc | null>(null);
 
-  const searchUsers = async (term: string) => {
+  const searchUsers = useCallback(async (term: string) => {
     if (!term || term.length < 2) {
       setResults([]);
       return;
@@ -17,7 +20,7 @@ export function useUserSearch() {
 
     setLoading(true);
     try {
-      const response = await apiPrivate.get<User[]>('/api/users/search', {
+      const response = await apiPrivate.get<User[]>('/api/user/search', {
         params: { query: term },
       });
       setResults(response.data);
@@ -28,15 +31,24 @@ export function useUserSearch() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const debouncedSearch = debounce(searchUsers, 200);
+  }, []);
 
   useEffect(() => {
-    debouncedSearch(searchTerm);
+    debouncedSearchRef.current = debounce((term: string) => {
+      searchUsers(term);
+    }, 500);
+
     return () => {
-      debouncedSearch.cancel();
+      debouncedSearchRef.current?.cancel();
     };
+  }, [searchUsers]);
+
+  useEffect(() => {
+    if (searchTerm) {
+      debouncedSearchRef.current?.(searchTerm);
+    } else {
+      setResults([]);
+    }
   }, [searchTerm]);
 
   return {

@@ -1,4 +1,4 @@
-export type user = {
+export type User = {
   alias: string;
   email: string;
 };
