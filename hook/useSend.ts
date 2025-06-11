@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { apiPrivate } from '@/lib/api';
 import { User } from '@/lib/user';
+import { P2PTransaction, P2PUser } from '@/lib/p2pTransaction';
+import { Money } from '@/lib/money';
 import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
 
@@ -22,11 +24,20 @@ export function useSend() {
 
     setLoading(true);
     try {
-      await apiPrivate.post('/api/transaction/send', {
-        recipientId: recipient.id,
-        amount,
-        currency,
-      });
+      const transaction: P2PTransaction = {
+        to: {
+          alias: recipient.alias,
+          email: recipient.email,
+        },
+        money: {
+          amount,
+          currency,
+        },
+      };
+
+      console.log('Transaction: ', transaction);
+
+      await apiPrivate.post('/api/wallet/send', transaction);
 
       Toast.show({
         type: 'success',
