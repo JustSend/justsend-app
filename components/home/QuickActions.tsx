@@ -1,7 +1,14 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing } from '@/styles/theme';
 import { router } from 'expo-router';
+import { useState } from 'react';
 
 const quickActions = [
   {
@@ -13,21 +20,42 @@ const quickActions = [
   {
     title: 'Withdraw',
     icon: 'remove-circle-outline',
-    color: Colors.primary,
+    color: Colors.error,
     onPress: () => router.push('/withdraw'),
+  },
+  {
+    title: 'Send',
+    icon: 'send-outline',
+    color: Colors.primary,
+    onPress: () => router.push('/send'),
+  },
+  {
+    title: 'Receive',
+    icon: 'download-outline',
+    color: Colors.warning,
+    onPress: () => router.push('/receive'),
   },
 ];
 
 export const QuickActions = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Quick Actions</Text>
       <View style={styles.grid}>
         {quickActions.map((action, index) => (
-          <TouchableOpacity
+          <Pressable
             key={index}
             onPress={action.onPress}
-            style={styles.actionCard}
+            onHoverIn={() => setHoveredIndex(index)}
+            onHoverOut={() => setHoveredIndex(null)}
+            style={({ hovered }) => [
+              styles.actionCard,
+              {
+                backgroundColor: hovered ? `${action.color}15` : Colors.white,
+              },
+            ]}
           >
             <View
               style={[
@@ -42,7 +70,7 @@ export const QuickActions = () => {
               />
             </View>
             <Text style={styles.actionText}>{action.title}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </View>
