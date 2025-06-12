@@ -23,6 +23,7 @@ export default function useTransactions(): UseTransactionsResult {
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+      console.log('transactions: ', sortedData);
       setTransactions(sortedData);
     } catch (err: any) {
       setError(err);

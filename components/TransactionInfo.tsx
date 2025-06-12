@@ -1,175 +1,104 @@
+import { View, Text, StyleSheet } from 'react-native';
+import { Colors, Typography, Spacing } from '@/styles/theme';
 import { Transaction } from '@/lib/interfaces';
-import { Text, View, StyleSheet } from 'react-native';
-import { Colors, Spacing, Typography } from '@/styles/theme';
 
-interface TransactionProps {
+interface TransactionInfoProps {
   transaction: Transaction;
 }
 
-export default function TransactionInfo({ transaction }: TransactionProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
-    return date.toLocaleString();
-  };
-
-  const getTransactionTypeDisplay = (type: string) => {
+export default function TransactionInfo({ transaction }: TransactionInfoProps) {
+  const getTransactionDetails = (type: Transaction['type']) => {
     switch (type) {
+      case 'SEND':
+        return { color: Colors.error, sign: '-', emoji: '↗️' };
+      case 'RECEIVE':
+        return { color: Colors.success, sign: '+', emoji: '↙️' };
       case 'DEPOSIT':
-        return 'Deposit';
-      case 'WITHDRAWAL':
-        return 'Withdrawal';
-      case 'TRANSFER':
-        return 'Transfer';
-      case 'PAYMENT':
-        return 'Payment';
+        return { color: Colors.success, sign: '+', emoji: '💰' };
+      case 'WITHDRAW':
+        return { color: Colors.error, sign: '-', emoji: '💸' };
       default:
-        return type;
+        return { color: Colors.black, sign: '', emoji: '💳' };
     }
   };
 
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case 'DEPOSIT':
-        return '↗️';
-      case 'WITHDRAWAL':
-        return '↙️';
-      case 'TRANSFER':
-        return '↔️';
-      case 'PAYMENT':
-        return '💳';
-      default:
-        return '💰';
-    }
-  };
-
-  const getAmountColor = (type: string) => {
-    switch (type) {
-      case 'DEPOSIT':
-        return Colors.success;
-      case 'WITHDRAWAL':
-      case 'PAYMENT':
-        return Colors.error;
-      case 'TRANSFER':
-        return Colors.warning || Colors.gray;
-      default:
-        return Colors.black;
-    }
-  };
-
-  const getAmountPrefix = (type: string) => {
-    switch (type) {
-      case 'DEPOSIT':
-        return '+';
-      case 'WITHDRAWAL':
-      case 'PAYMENT':
-        return '-';
-      case 'TRANSFER':
-        return '';
-      default:
-        return '';
-    }
-  };
+  const { color, sign, emoji } = getTransactionDetails(transaction.type);
+  const showEmail =
+    transaction.type === 'SEND' || transaction.type === 'RECEIVE';
 
   return (
-    <View style={styles.transactionCard}>
-      <View style={styles.leftSection}>
-        <View style={styles.iconContainer}>
-          <Text style={styles.transactionIcon}>
-            {getTransactionIcon(transaction.type)}
+    <View style={styles.container}>
+      <View style={styles.leftContent}>
+        <View style={styles.titleRow}>
+          <Text style={styles.emoji}>{emoji}</Text>
+          <Text style={styles.title}>
+            {showEmail
+              ? `${transaction.type} ${transaction.email}`
+              : transaction.type}
           </Text>
         </View>
-        <View style={styles.transactionInfo}>
-          <Text style={styles.transactionTitle}>
-            {getTransactionTypeDisplay(transaction.type)}
-          </Text>
-          <Text style={styles.transactionDate}>
-            {formatDate(transaction.createdAt)}
-          </Text>
-        </View>
+        <Text style={styles.date}>
+          {new Date(transaction.createdAt).toLocaleDateString()}
+        </Text>
       </View>
-
-      <View style={styles.rightSection}>
-        <Text
-          style={[
-            styles.transactionAmount,
-            { color: getAmountColor(transaction.type) },
-          ]}
-        >
-          {getAmountPrefix(transaction.type)}
-          {Math.abs(transaction.amount).toLocaleString('en-US', {
+      <View style={styles.rightContent}>
+        <Text style={[styles.amount, { color }]}>
+          {sign}{' '}
+          {transaction.amount.toLocaleString('en-US', {
             style: 'currency',
             currency: transaction.currency,
           })}
         </Text>
-        <Text style={styles.currencyCode}>{transaction.currency}</Text>
+        <Text style={styles.currency}>{transaction.currency}</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  transactionCard: {
+  container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.white,
     padding: Spacing.md,
+    backgroundColor: Colors.white,
     borderRadius: 12,
     marginBottom: Spacing.sm,
     shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
-  leftSection: {
+  leftContent: {
+    flex: 1,
+  },
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    marginBottom: Spacing.xs,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.background || '#f5f5f5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: Spacing.sm,
-  },
-  transactionIcon: {
+  emoji: {
     fontSize: 20,
+    marginRight: Spacing.xs,
   },
-  transactionInfo: {
-    flex: 1,
-  },
-  transactionTitle: {
+  title: {
     ...Typography.subtitle,
     color: Colors.black,
-    fontWeight: '600',
   },
-  transactionDate: {
-    ...Typography.caption,
-    color: Colors.gray,
-    marginTop: 2,
-  },
-  transactionId: {
-    ...Typography.caption,
-    color: Colors.gray,
-    marginTop: 1,
-    fontSize: 10,
-  },
-  rightSection: {
+  rightContent: {
     alignItems: 'flex-end',
   },
-  transactionAmount: {
-    ...Typography.subtitle,
-    fontWeight: '600',
-  },
-  currencyCode: {
+  date: {
     ...Typography.caption,
     color: Colors.gray,
-    marginTop: 2,
-    fontSize: 10,
+  },
+  amount: {
+    ...Typography.subtitle,
+    marginBottom: Spacing.xs,
+  },
+  currency: {
+    ...Typography.caption,
+    color: Colors.gray,
   },
 });

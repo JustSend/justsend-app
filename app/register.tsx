@@ -50,8 +50,11 @@ export default function Register() {
         email,
         password
       );
-      const uid = userCredential.user.uid;
-      await apiPublic.post(`/user/${uid}`);
+      const user = {
+        uid: userCredential.user.uid,
+        email: email,
+      };
+      await apiPublic.post(`/api/user/register`, user);
       router.navigate('/login');
       Toast.show({
         type: 'success',
