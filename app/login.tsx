@@ -55,7 +55,7 @@ export default function Login() {
           keyboardType="email-address"
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
-          accessibilityLabel="Email Input"
+          testID="Email Input"
         />
         <TextInput
           placeholder="Password"
@@ -64,7 +64,7 @@ export default function Login() {
           secureTextEntry
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
-          accessibilityLabel="Password Input"
+          testID="Password Input"
         />
 
         <TouchableOpacity
@@ -75,7 +75,7 @@ export default function Login() {
             loading && { opacity: 0.6 },
           ]}
           onPress={handleLogin}
-          accessibilityLabel="Login Button"
+          testID="Login Button"
         >
           <Text style={GlobalStyles.buttonText}>
             {loading ? 'Signing In...' : 'Sign In'}
@@ -83,10 +83,7 @@ export default function Login() {
         </TouchableOpacity>
 
         {error && (
-          <Text
-            style={GlobalStyles.errorText}
-            accessibilityLabel="Error Message"
-          >
+          <Text style={GlobalStyles.errorText} testID="Error Message">
             {error}
           </Text>
         )}
@@ -109,7 +106,7 @@ export default function Login() {
             Keyboard.dismiss();
             router.navigate('/register');
           }}
-          accessibilityLabel="Sign Up"
+          testID="Sign Up"
         >
           <Text style={GlobalStyles.secondaryButtonText}>Create Account</Text>
         </TouchableOpacity>

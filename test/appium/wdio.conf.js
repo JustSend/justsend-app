@@ -19,6 +19,8 @@ exports.config = {
       'appium:deviceName': 'emulator-5554',
       'appium:platformVersion': '15.0',
       'appium:automationName': 'UiAutomator2',
+      'appium:appPackage': 'com.aseca.justsend',
+      'appium:appActivity': 'com.justsend.app.MainActivity',
       'appium:noReset': true,
     },
   ],

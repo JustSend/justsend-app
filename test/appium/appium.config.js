@@ -1,7 +1,7 @@
 exports.config = {
   runner: 'local',
   port: 4723,
-  path: '/wd/hub',
+  path: '/',
   specs: ['./tests/*.spec.ts'],
   exclude: [],
   maxInstances: 1,
@@ -13,7 +13,6 @@ exports.config = {
       'appium:platformName': 'Android',
       'appium:automationName': 'UiAutomator2',
       'appium:platformVersion': '13.0',
-      'appium:app': './android/app/build/outputs/apk/debug/app-debug.apk',
       'appium:noReset': true,
       'appium:deviceName': 'emulator-5554',
     },
