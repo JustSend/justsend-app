@@ -1,11 +1,6 @@
 describe('App', () => {
   beforeEach(() => {
-    cy.login(
-      Cypress.env('TEST_USER_EMAIL'),
-      Cypress.env('TEST_USER_PASSWORD')
-    ).then(() => {
-      cy.visit('/');
-    });
+    cy.login(Cypress.env('TEST_USER_EMAIL'), Cypress.env('TEST_USER_PASSWORD'));
   });
 
   it('should load the app successfully', () => {
