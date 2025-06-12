@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
 import { Ionicons } from '@expo/vector-icons';

@@ -9,6 +9,7 @@ import {
   Animated,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
@@ -19,7 +20,9 @@ import { depositStyles } from '@/styles/deposit';
 import { useUserSearch } from '@/hook/useUserSearch';
 import { User } from '@/lib/user';
 import { useSend } from '@/hook/useSend';
-import Toast from 'react-native-toast-message';
+
+const { width } = Dimensions.get('window');
+const isMobile = width < 768;
 
 export default function SendScreen() {
   const [amount, setAmount] = useState('');
@@ -97,9 +100,14 @@ export default function SendScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <View style={depositStyles.container}>
+      <View
+        style={[depositStyles.container, isMobile && styles.mobileContainer]}
+      >
         <TouchableOpacity
-          style={depositStyles.backButton}
+          style={[
+            depositStyles.backButton,
+            isMobile && styles.mobileBackButton,
+          ]}
           onPress={() => {
             if (router.canGoBack?.()) {
               router.back();
@@ -112,10 +120,10 @@ export default function SendScreen() {
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 200 }}
+          contentContainerStyle={{ paddingBottom: isMobile ? 100 : 200 }}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={depositStyles.card}>
+          <View style={[depositStyles.card, isMobile && styles.mobileCard]}>
             <Text style={depositStyles.title}>Send Money</Text>
             <Text
               style={[
@@ -313,6 +321,23 @@ export default function SendScreen() {
 }
 
 const styles = StyleSheet.create({
+  mobileContainer: {
+    backgroundColor: Colors.white,
+    padding: Spacing.md,
+    paddingTop: Spacing.xl * 2,
+  },
+  mobileBackButton: {
+    top: Spacing.xl,
+    left: Spacing.md,
+  },
+  mobileCard: {
+    width: '100%',
+    maxWidth: '100%',
+    borderRadius: 0,
+    shadowOpacity: 0,
+    elevation: 0,
+    padding: Spacing.md,
+  },
   searchContainer: {
     position: 'relative',
     zIndex: 1000,
