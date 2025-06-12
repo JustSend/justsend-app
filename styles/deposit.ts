@@ -88,11 +88,14 @@ export const depositStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.white,
     borderRadius: 12,
     padding: Spacing.md,
     ...Typography.body,
     width: '100%',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    color: Colors.black,
   },
   inputError: {
     borderWidth: 1,

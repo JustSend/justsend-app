@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import { useDeposit } from '@/hook/useDeposit';
@@ -137,115 +130,98 @@ export default function DepositScreen() {
 
   return (
     <View style={depositStyles.container}>
-      <TouchableOpacity
-        style={depositStyles.backButton}
-        onPress={() => {
-          if (router.canGoBack?.()) {
-            router.back();
-          } else {
-            router.replace('/');
-          }
-        }}
+      <Text style={depositStyles.title}>DEBIN Deposit</Text>
+      <Text
+        style={[
+          Typography.subtitle,
+          {
+            color: Colors.gray,
+            marginBottom: Spacing.lg,
+            textAlign: 'center',
+          },
+        ]}
       >
-        <Ionicons name="chevron-back" size={24} color={Colors.primary} />
-      </TouchableOpacity>
-      <View style={depositStyles.card}>
-        <Text style={depositStyles.title}>DEBIN Deposit</Text>
-        <Text
-          style={[
-            Typography.subtitle,
-            {
-              color: Colors.gray,
-              marginBottom: Spacing.lg,
-              textAlign: 'center',
-            },
-          ]}
-        >
-          Enter your routing number for an immediate deposit
-        </Text>
+        Enter your routing number for an immediate deposit
+      </Text>
 
-        <Text
-          style={[
-            Typography.subtitle,
-            {
+      <Text
+        style={[
+          Typography.subtitle,
+          {
+            color: Colors.gray,
+            marginBottom: Spacing.xs,
+            marginTop: Spacing.lg,
+            alignSelf: 'flex-start',
+          },
+        ]}
+      >
+        Routing Number
+      </Text>
+      <TextInput
+        style={getInputStyle(
+          showBankErrors && (!bankRouting || bankRouting.length !== 9)
+        )}
+        placeholder="Enter routing number"
+        placeholderTextColor={Colors.gray}
+        keyboardType="numeric"
+        value={bankRouting}
+        onChangeText={handleBankRoutingChange}
+        maxLength={9}
+      />
+
+      <View style={depositStyles.amountCurrencyRow}>
+        <View style={{ flex: 2, marginRight: Spacing.md }}>
+          <Text
+            style={{
+              ...Typography.subtitle,
               color: Colors.gray,
               marginBottom: Spacing.xs,
               marginTop: Spacing.lg,
               alignSelf: 'flex-start',
-            },
-          ]}
-        >
-          Routing Number
-        </Text>
-        <TextInput
-          style={getInputStyle(
-            showBankErrors && (!bankRouting || bankRouting.length !== 9)
-          )}
-          placeholder="Enter routing number"
-          placeholderTextColor={Colors.gray}
-          keyboardType="numeric"
-          value={bankRouting}
-          onChangeText={handleBankRoutingChange}
-          maxLength={9}
-        />
-
-        <View style={depositStyles.amountCurrencyRow}>
-          <View style={{ flex: 2, marginRight: Spacing.md }}>
-            <Text
-              style={{
-                ...Typography.subtitle,
-                color: Colors.gray,
-                marginBottom: Spacing.xs,
-                marginTop: Spacing.lg,
-                alignSelf: 'flex-start',
-              }}
-            >
-              Amount
-            </Text>
-            <TextInput
-              style={getInputStyle(showAmountError)}
-              placeholder="Enter amount"
-              placeholderTextColor={Colors.gray}
-              keyboardType="numeric"
-              value={amount}
-              onChangeText={(text) => {
-                setAmount(text);
-                setShowAmountError(false);
-              }}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                ...Typography.subtitle,
-                color: Colors.gray,
-                marginBottom: Spacing.xs,
-                marginTop: Spacing.lg,
-                alignSelf: 'flex-start',
-              }}
-            >
-              Currency
-            </Text>
-            <CurrencySelector
-              currencies={currencies}
-              selectedCurrency={selectedCurrency}
-              onSelect={setSelectedCurrency}
-            />
-          </View>
-        </View>
-        <TouchableOpacity
-          style={[
-            depositStyles.button,
-            loading && depositStyles.buttonDisabled,
-          ]}
-          onPress={handleDeposit}
-          disabled={loading}
-        >
-          <Text style={depositStyles.buttonText}>
-            {loading ? 'Processing...' : 'Deposit with DEBIN'}
+            }}
+          >
+            Amount
           </Text>
-        </TouchableOpacity>
+          <TextInput
+            style={getInputStyle(showAmountError)}
+            placeholder="Enter amount"
+            placeholderTextColor={Colors.gray}
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={(text) => {
+              setAmount(text);
+              setShowAmountError(false);
+            }}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              ...Typography.subtitle,
+              color: Colors.gray,
+              marginBottom: Spacing.xs,
+              marginTop: Spacing.lg,
+              alignSelf: 'flex-start',
+            }}
+          >
+            Currency
+          </Text>
+          <CurrencySelector
+            currencies={currencies}
+            selectedCurrency={selectedCurrency}
+            onSelect={setSelectedCurrency}
+          />
+        </View>
       </View>
+      <TouchableOpacity
+        style={[depositStyles.button, loading && depositStyles.buttonDisabled]}
+        onPress={handleDeposit}
+        disabled={loading}
+      >
+        <Text style={depositStyles.buttonText}>
+          {loading ? 'Processing...' : 'Deposit with DEBIN'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

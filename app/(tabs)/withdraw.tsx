@@ -12,8 +12,6 @@ import {
 import { useState } from 'react';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { currencies } from '@/lib/currency';
 import { depositStyles } from '@/styles/deposit';
 
@@ -32,35 +30,20 @@ export default function WithdrawScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
       <View
         style={[depositStyles.container, isMobile && styles.mobileContainer]}
       >
-        <TouchableOpacity
-          style={[
-            depositStyles.backButton,
-            isMobile && styles.mobileBackButton,
-          ]}
-          onPress={() => {
-            if (router.canGoBack?.()) {
-              router.back();
-            } else {
-              router.replace('/');
-            }
-          }}
-        >
-          <Ionicons name="chevron-back" size={24} color={Colors.primary} />
-        </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: isMobile ? 100 : 200 }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
-          <View style={[depositStyles.card, isMobile && styles.mobileCard]}>
+          <View style={styles.contentContainer}>
             <Text style={depositStyles.title}>Withdraw Funds</Text>
             <Text
               style={[
@@ -138,18 +121,16 @@ const styles = StyleSheet.create({
   mobileContainer: {
     backgroundColor: Colors.white,
     padding: Spacing.md,
-    paddingTop: Spacing.xl * 2,
   },
-  mobileBackButton: {
-    top: Spacing.xl,
-    left: Spacing.md,
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: isMobile ? 100 : 200,
   },
-  mobileCard: {
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    maxWidth: 500,
     width: '100%',
-    maxWidth: '100%',
-    borderRadius: 0,
-    shadowOpacity: 0,
-    elevation: 0,
-    padding: Spacing.md,
+    alignSelf: 'center',
   },
 });

@@ -201,8 +201,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.lightGray,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    paddingVertical: Spacing.sm,
     borderRadius: 20,
+    height: 44,
   },
   selectorText: {
     ...Typography.subtitle,

@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useUserDetails } from '@/hook/useUserDetails';
 import { depositStyles } from '@/styles/deposit';
 import Toast from 'react-native-toast-message';
@@ -54,18 +53,6 @@ export default function ReceiveScreen() {
 
   return (
     <View style={depositStyles.container}>
-      <TouchableOpacity
-        style={depositStyles.backButton}
-        onPress={() => {
-          if (router.canGoBack?.()) {
-            router.back();
-          } else {
-            router.replace('/');
-          }
-        }}
-      >
-        <Ionicons name="chevron-back" size={24} color={Colors.primary} />
-      </TouchableOpacity>
       <View style={depositStyles.card}>
         <Text style={depositStyles.title}>Receive Money</Text>
         <Text
