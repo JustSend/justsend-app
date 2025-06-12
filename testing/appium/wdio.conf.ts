@@ -1,21 +1,27 @@
-exports.config = {
+import type { Options } from '@wdio/types';
+export const config: Options.Testrunner = {
   runner: 'local',
+  autoCompileOpts: {
+    autoCompile: true,
+    tsNodeOpts: {
+      project: '../tsconfig.json',
+      transpileOnly: true,
+    },
+  },
+
   port: 4723,
-  path: '/wd/hub',
-  specs: ['./tests/*.spec.ts'],
+  specs: ['./tests/*.ts'],
   exclude: [],
-  maxInstances: 1,
+  maxInstances: 10,
   capabilities: [
     {
-      maxInstances: 1,
+      platformName: 'Android',
       browserName: '',
-      acceptInsecureCerts: true,
-      'appium:platformName': 'Android',
+      'appium:deviceName': 'Android GoogleAPI Emulator',
+      'appium:platformVersion': '12.0',
       'appium:automationName': 'UiAutomator2',
-      'appium:platformVersion': '13.0',
       'appium:app': './android/app/build/outputs/apk/debug/app-debug.apk',
       'appium:noReset': true,
-      'appium:deviceName': 'emulator-5554',
     },
   ],
   logLevel: 'info',
@@ -24,7 +30,7 @@ exports.config = {
   waitforTimeout: 10000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 3,
-  services: ['appium'],
+  services: ['appium', 'visual'],
   framework: 'mocha',
   reporters: ['spec'],
   mochaOpts: {
