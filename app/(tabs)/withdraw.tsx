@@ -8,12 +8,16 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useState } from 'react';
 import { Colors, Spacing, Typography } from '@/styles/theme';
 import { CurrencySelector } from '@/components/home/CurrencySelector';
 import { currencies } from '@/lib/currency';
 import { depositStyles } from '@/styles/deposit';
+import { useWithdraw } from '../hooks/useWithdraw';
+import Toast from 'react-native-toast-message';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const isMobile = width < 768;
@@ -22,11 +26,66 @@ export default function WithdrawScreen() {
   const [amount, setAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [showAmountError, setShowAmountError] = useState(false);
+  const [routingNumber, setRoutingNumber] = useState('');
+  const [showRoutingError, setShowRoutingError] = useState(false);
+  const { withdraw, isLoading, error } = useWithdraw();
 
   const getInputStyle = (hasError: boolean) => [
     depositStyles.input,
     hasError && depositStyles.inputError,
   ];
+
+  const handleWithdraw = async () => {
+    if (!amount || isNaN(parseFloat(amount))) {
+      setShowAmountError(true);
+      return;
+    }
+
+    if (!routingNumber) {
+      setShowRoutingError(true);
+      return;
+    }
+
+    try {
+      const result = await withdraw({
+        amount,
+        currency: selectedCurrency,
+        routingNumber,
+      });
+
+      if (result.success) {
+        Toast.show({
+          type: 'success',
+          text1: 'Withdrawal Successful! 🎉',
+          text2: `You withdrew ${selectedCurrency} ${parseFloat(
+            amount
+          ).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+          position: 'top',
+          visibilityTime: 4000,
+        });
+        router.replace('/');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Withdrawal Failed',
+          text2: result.message || 'Failed to process withdrawal',
+          position: 'top',
+          visibilityTime: 4000,
+        });
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Withdrawal Failed',
+        text2: error || 'An unexpected error occurred',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -107,8 +166,43 @@ export default function WithdrawScreen() {
               </View>
             </View>
 
-            <TouchableOpacity style={depositStyles.button}>
-              <Text style={depositStyles.buttonText}>Withdraw</Text>
+            <View style={{ marginTop: Spacing.lg }}>
+              <Text
+                style={[
+                  Typography.subtitle,
+                  {
+                    color: Colors.gray,
+                    marginBottom: Spacing.xs,
+                    alignSelf: 'flex-start',
+                  },
+                ]}
+              >
+                Bank Routing Number
+              </Text>
+              <TextInput
+                style={getInputStyle(showRoutingError)}
+                placeholder="Enter routing number"
+                placeholderTextColor={Colors.gray}
+                keyboardType="numeric"
+                value={routingNumber}
+                onChangeText={(text) => {
+                  setRoutingNumber(text);
+                  setShowRoutingError(false);
+                }}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[
+                depositStyles.button,
+                isLoading && depositStyles.buttonDisabled,
+              ]}
+              onPress={handleWithdraw}
+              disabled={isLoading}
+            >
+              <Text style={depositStyles.buttonText}>
+                {isLoading ? 'Processing...' : 'Withdraw'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
