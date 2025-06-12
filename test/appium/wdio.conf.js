@@ -1,5 +1,4 @@
-import type { Options } from '@wdio/types';
-export const config: Options.Testrunner = {
+exports.config = {
   runner: 'local',
   autoCompileOpts: {
     autoCompile: true,
@@ -17,10 +16,9 @@ export const config: Options.Testrunner = {
     {
       platformName: 'Android',
       browserName: '',
-      'appium:deviceName': 'Android GoogleAPI Emulator',
-      'appium:platformVersion': '12.0',
+      'appium:deviceName': 'emulator-5554',
+      'appium:platformVersion': '15.0',
       'appium:automationName': 'UiAutomator2',
-      'appium:app': './android/app/build/outputs/apk/debug/app-debug.apk',
       'appium:noReset': true,
     },
   ],

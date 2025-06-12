@@ -1,21 +1,21 @@
 class LoginPage {
   // Selectors
-  private get emailInput() {
+  get emailInput() {
     return $('~Email Input');
   }
-  private get passwordInput() {
+  get passwordInput() {
     return $('~Password Input');
   }
-  private get loginButton() {
+  get loginButton() {
     return $('~Login Button');
   }
-  private get forgotPasswordButton() {
+  get forgotPasswordButton() {
     return $('~Forgot Password');
   }
-  private get signUpButton() {
+  get signUpButton() {
     return $('~Sign Up');
   }
-  private get errorMessage() {
+  get errorMessage() {
     return $('~Error Message');
   }
 

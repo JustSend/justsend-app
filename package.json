@@ -14,7 +14,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test:e2e": "start-server-and-test 'npm run web' http://localhost:19006 'cypress run'",
-    "test:appium": "wdio testing/appium/appium.config.js",
+    "test:appium": "wdio test/appium/wdio.conf.js",
     "test:appium:ios": "wdio testing/appium/appium.config.js --spec testing/appium/tests/auth.spec.js --capabilities.platformName=iOS",
     "test:appium:android": "wdio testing/appium/appium.config.js --spec testing/appium/tests/auth.spec.js --capabilities.platformName=Android",
     "wdio": "wdio run ./wdio.conf.ts"

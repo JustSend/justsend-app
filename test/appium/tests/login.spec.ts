@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { assert } from 'chai';
 import LoginPage from '../pages/LoginPage';
 
 describe('Login Screen', () => {
@@ -9,14 +9,19 @@ describe('Login Screen', () => {
   });
 
   it('should display login form', async () => {
-    expect(await LoginPage.emailInput.isDisplayed()).to.be.true;
-    expect(await LoginPage.passwordInput.isDisplayed()).to.be.true;
-    expect(await LoginPage.loginButton.isDisplayed()).to.be.true;
+    const isEmailDisplayed = await LoginPage.emailInput.isDisplayed();
+    const isPasswordDisplayed = await LoginPage.passwordInput.isDisplayed();
+    const isLoginButtonDisplayed = await LoginPage.loginButton.isDisplayed();
+
+    assert.isTrue(isEmailDisplayed);
+    assert.isTrue(isPasswordDisplayed);
+    assert.isTrue(isLoginButtonDisplayed);
   });
 
   it('should show error with invalid credentials', async () => {
     await LoginPage.login('invalid@email.com', 'wrongpassword');
-    expect(await LoginPage.isErrorMessageDisplayed()).to.be.true;
+    const isErrorDisplayed = await LoginPage.isErrorMessageDisplayed();
+    assert.isTrue(isErrorDisplayed);
   });
 
   it('should navigate to forgot password', async () => {
