@@ -1,5 +1,7 @@
 describe('App', () => {
   beforeEach(() => {
+    // Programmatic login before visiting the home page
+    cy.login(Cypress.env('TEST_USER_EMAIL'), Cypress.env('TEST_USER_PASSWORD'));
     cy.visit('/');
   });
 
