@@ -29,10 +29,10 @@ export default function TransactionInfo({ transaction }: TransactionInfoProps) {
 
   const getTitle = () => {
     if (transaction.type === 'RECEIVE') {
-      return `Received from: ${transaction.email}`;
+      return `From: ${transaction.email}`;
     }
     if (transaction.type === 'SEND') {
-      return `Sent to: ${transaction.email}`;
+      return `To: ${transaction.email}`;
     }
     return transaction.type;
   };

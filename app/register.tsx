@@ -60,11 +60,22 @@ export default function Register() {
         type: 'success',
         text1: 'Registration successful!',
         text2: 'You can now sign in.',
+        position: 'top',
+        visibilityTime: 4000,
+        autoHide: true,
       });
     } catch (err: any) {
       console.log(err);
       const code = err.code || extractCodeFromMessage(err.message);
       setError(errorMessages[code] || 'An error occurred. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: errorMessages[code] || 'An error occurred. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+        autoHide: true,
+      });
     } finally {
       setLoading(false);
     }
