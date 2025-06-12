@@ -10,14 +10,14 @@ describe('Send Money Screen', () => {
 
   it('renders the send form', () => {
     cy.contains('Send Money').should('be.visible');
-    cy.get('input[placeholder="Enter recipient\'s email"]').should('exist');
+    cy.get('input[placeholder="Search by email or alias"]').should('exist');
     cy.get('input[placeholder="Enter amount"]').should('exist');
     cy.contains('Send Money').should('exist');
   });
 
   it('shows error for empty fields', () => {
     cy.contains('Send Money').click();
-    cy.get('input[placeholder="Enter recipient\'s email"]').should(
+    cy.get('input[placeholder="Search by email or alias"]').should(
       'have.css',
       'border-color'
     );
@@ -28,7 +28,7 @@ describe('Send Money Screen', () => {
   });
 
   it('shows error for invalid amount', () => {
-    cy.get('input[placeholder="Enter recipient\'s email"]').type(
+    cy.get('input[placeholder="Search by email or alias"]').type(
       'test@example.com'
     );
     cy.get('input[placeholder="Enter amount"]').type('-10');
