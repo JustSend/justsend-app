@@ -1,20 +1,26 @@
 exports.config = {
   runner: 'local',
+  autoCompileOpts: {
+    autoCompile: true,
+    tsNodeOpts: {
+      project: '../tsconfig.json',
+      transpileOnly: true,
+    },
+  },
+
   port: 4723,
-  path: '/wd/hub',
-  specs: ['./tests/**/*.spec.js'],
+  specs: ['./tests/*.ts'],
   exclude: [],
-  maxInstances: 1,
+  maxInstances: 10,
   capabilities: [
     {
-      maxInstances: 1,
+      platformName: 'Android',
       browserName: '',
-      acceptInsecureCerts: true,
-      'appium:platformName': 'Android',
+      'appium:deviceName': 'emulator-5554',
+      'appium:platformVersion': '15.0',
       'appium:automationName': 'UiAutomator2',
-      'appium:deviceName': 'Android Emulator',
-      'appium:platformVersion': '13.0',
-      'appium:app': './android/app/build/outputs/apk/debug/app-debug.apk',
+      'appium:appPackage': 'com.aseca.justsend',
+      'appium:appActivity': 'com.justsend.app.MainActivity',
       'appium:noReset': true,
     },
   ],
@@ -24,7 +30,7 @@ exports.config = {
   waitforTimeout: 10000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 3,
-  services: ['appium'],
+  services: ['appium', 'visual'],
   framework: 'mocha',
   reporters: ['spec'],
   mochaOpts: {

@@ -55,6 +55,7 @@ export default function Login() {
           keyboardType="email-address"
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
+          testID="Email Input"
         />
         <TextInput
           placeholder="Password"
@@ -63,6 +64,7 @@ export default function Login() {
           secureTextEntry
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
+          testID="Password Input"
         />
 
         <TouchableOpacity
@@ -73,13 +75,18 @@ export default function Login() {
             loading && { opacity: 0.6 },
           ]}
           onPress={handleLogin}
+          testID="Login Button"
         >
           <Text style={GlobalStyles.buttonText}>
             {loading ? 'Signing In...' : 'Sign In'}
           </Text>
         </TouchableOpacity>
 
-        {error && <Text style={GlobalStyles.errorText}>{error}</Text>}
+        {error && (
+          <Text style={GlobalStyles.errorText} testID="Error Message">
+            {error}
+          </Text>
+        )}
 
         <View style={GlobalStyles.divider}>
           <View style={GlobalStyles.dividerLine} />
@@ -99,6 +106,7 @@ export default function Login() {
             Keyboard.dismiss();
             router.navigate('/register');
           }}
+          testID="Sign Up"
         >
           <Text style={GlobalStyles.secondaryButtonText}>Create Account</Text>
         </TouchableOpacity>
