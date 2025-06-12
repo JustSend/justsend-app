@@ -1,6 +1,11 @@
 describe('Send Money Screen', () => {
   beforeEach(() => {
-    cy.visit('/send');
+    cy.login(
+      Cypress.env('TEST_USER_EMAIL'),
+      Cypress.env('TEST_USER_PASSWORD')
+    ).then(() => {
+      cy.visit('/send');
+    });
   });
 
   it('renders the send form', () => {
