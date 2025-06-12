@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { apiPrivate } from '@/lib/api';
 import { User } from '@/lib/user';
-import { P2PTransaction, P2PUser } from '@/lib/p2pTransaction';
-import { Money } from '@/lib/money';
+import { apiPrivate } from '@/lib/api';
 import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
 
@@ -12,69 +10,81 @@ interface SendParams {
   currency: string;
 }
 
-export function useSend() {
+interface SendResponse {
+  success: boolean;
+  message?: string;
+}
+
+export const useSend = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const send = async ({ recipient, amount, currency }: SendParams) => {
-    if (!recipient || !amount || !currency) {
-      setError('Missing required fields');
-      return;
-    }
-
+  const send = async (params: SendParams): Promise<SendResponse> => {
     setLoading(true);
     try {
-      const transaction: P2PTransaction = {
+      const transaction = {
         to: {
-          alias: recipient.alias,
-          email: recipient.email,
+          alias: params.recipient.alias,
+          email: params.recipient.email,
         },
         money: {
-          amount,
-          currency,
+          amount: params.amount,
+          currency: params.currency,
         },
       };
 
-      console.log('Transaction: ', transaction);
+      const response = await apiPrivate.post('/api/wallet/send', transaction);
 
-      await apiPrivate.post('/api/wallet/send', transaction);
+      if (!response.data.success) {
+        Toast.show({
+          type: 'error',
+          text1: 'Transaction Failed',
+          text2: response.data.message || 'Failed to send money',
+          position: 'top',
+          visibilityTime: 4000,
+        });
+        return {
+          success: false,
+          message: response.data.message,
+        };
+      }
 
       Toast.show({
         type: 'success',
         text1: 'Send Successful! 🎉',
-        text2: `You sent ${currency} ${amount.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} to ${recipient.email}`,
+        text2: `You sent ${params.currency} ${params.amount.toLocaleString(
+          'en-US',
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        )} to ${params.recipient.email}`,
         position: 'top',
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
-        bottomOffset: 40,
       });
 
       router.replace('/');
-    } catch (err) {
-      setError('Failed to send money');
-      console.error('Error sending money:', err);
+
+      return {
+        success: true,
+        message: 'Send successful',
+      };
+    } catch (error: any) {
       Toast.show({
         type: 'error',
-        text1: 'Send Failed',
-        text2: 'There was an error processing your transaction',
+        text1: 'Transaction Failed',
+        text2: error.response?.data?.message || 'An unexpected error occurred',
         position: 'top',
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
-        bottomOffset: 40,
       });
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || 'An unexpected error occurred',
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  return {
-    send,
-    loading,
-    error,
-  };
-}
+  return { send, loading };
+};

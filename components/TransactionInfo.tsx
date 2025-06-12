@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { Colors, Typography, Spacing } from '@/styles/theme';
 import { Transaction } from '@/lib/interfaces';
 
@@ -7,6 +7,9 @@ interface TransactionInfoProps {
 }
 
 export default function TransactionInfo({ transaction }: TransactionInfoProps) {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 375;
+
   const getTransactionDetails = (type: Transaction['type']) => {
     switch (type) {
       case 'SEND':
@@ -23,33 +26,51 @@ export default function TransactionInfo({ transaction }: TransactionInfoProps) {
   };
 
   const { color, sign, emoji } = getTransactionDetails(transaction.type);
-  const showEmail =
-    transaction.type === 'SEND' || transaction.type === 'RECEIVE';
+
+  const getTitle = () => {
+    if (transaction.type === 'RECEIVE') {
+      return `Received from: ${transaction.email}`;
+    }
+    if (transaction.type === 'SEND') {
+      return `Sent to: ${transaction.email}`;
+    }
+    return transaction.type;
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isSmallScreen && styles.containerSmall]}>
       <View style={styles.leftContent}>
         <View style={styles.titleRow}>
           <Text style={styles.emoji}>{emoji}</Text>
-          <Text style={styles.title}>
-            {showEmail
-              ? `${transaction.type} ${transaction.email}`
-              : transaction.type}
+          <Text
+            style={[styles.title, isSmallScreen && styles.titleSmall]}
+            numberOfLines={1}
+          >
+            {getTitle()}
           </Text>
         </View>
-        <Text style={styles.date}>
+        <Text style={[styles.date, isSmallScreen && styles.dateSmall]}>
           {new Date(transaction.createdAt).toLocaleDateString()}
         </Text>
       </View>
       <View style={styles.rightContent}>
-        <Text style={[styles.amount, { color }]}>
+        <Text
+          style={[
+            styles.amount,
+            { color },
+            isSmallScreen && styles.amountSmall,
+          ]}
+          numberOfLines={1}
+        >
           {sign}{' '}
           {transaction.amount.toLocaleString('en-US', {
             style: 'currency',
             currency: transaction.currency,
           })}
         </Text>
-        <Text style={styles.currency}>{transaction.currency}</Text>
+        <Text style={[styles.currency, isSmallScreen && styles.currencySmall]}>
+          {transaction.currency}
+        </Text>
       </View>
     </View>
   );
@@ -70,8 +91,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  containerSmall: {
+    padding: Spacing.sm,
+  },
   leftContent: {
     flex: 1,
+    marginRight: Spacing.sm,
   },
   titleRow: {
     flexDirection: 'row',
@@ -85,20 +110,34 @@ const styles = StyleSheet.create({
   title: {
     ...Typography.subtitle,
     color: Colors.black,
+    flex: 1,
+  },
+  titleSmall: {
+    fontSize: 14,
   },
   rightContent: {
     alignItems: 'flex-end',
+    minWidth: 100,
   },
   date: {
     ...Typography.caption,
     color: Colors.gray,
   },
+  dateSmall: {
+    fontSize: 12,
+  },
   amount: {
     ...Typography.subtitle,
     marginBottom: Spacing.xs,
   },
+  amountSmall: {
+    fontSize: 14,
+  },
   currency: {
     ...Typography.caption,
     color: Colors.gray,
+  },
+  currencySmall: {
+    fontSize: 12,
   },
 });
