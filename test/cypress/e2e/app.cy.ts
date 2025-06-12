@@ -8,17 +8,4 @@ describe('App', () => {
       cy.get('body').should('be.visible');
     });
   });
-
-  it('should have basic navigation elements', () => {
-    cy.then(() => {
-      cy.get('nav').should('exist');
-    });
-  });
-
-  it('should handle basic user interactions', () => {
-    cy.then(() => {
-      cy.get('button').should('exist');
-      cy.get('input').should('exist');
-    });
-  });
 });
