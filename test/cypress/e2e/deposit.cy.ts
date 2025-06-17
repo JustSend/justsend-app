@@ -1,11 +1,10 @@
 describe('DEBIN Deposit Screen', () => {
+  before(() => {
+    cy.login(Cypress.env('TEST_USER_EMAIL'), Cypress.env('TEST_USER_PASSWORD'));
+  });
+
   beforeEach(() => {
-    cy.login(
-      Cypress.env('TEST_USER_EMAIL'),
-      Cypress.env('TEST_USER_PASSWORD')
-    ).then(() => {
-      cy.visit('/deposit');
-    });
+    cy.visit('/deposit');
   });
 
   it('renders the deposit form', () => {

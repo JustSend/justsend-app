@@ -1,5 +1,5 @@
 describe('App', () => {
-  beforeEach(() => {
+  before(() => {
     cy.login(Cypress.env('TEST_USER_EMAIL'), Cypress.env('TEST_USER_PASSWORD'));
   });
 
