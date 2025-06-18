@@ -13,11 +13,8 @@
     "format-and-stage": "prettier --write . && git add .",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test:e2e": "start-server-and-test 'npm run web' http://localhost:19006 'cypress run'",
-    "test:appium": "wdio test/appium/wdio.conf.js",
-    "test:appium:ios": "wdio testing/appium/appium.config.js --spec testing/appium/tests/auth.spec.js --capabilities.platformName=iOS",
-    "test:appium:android": "wdio testing/appium/appium.config.js --spec testing/appium/tests/auth.spec.js --capabilities.platformName=Android",
-    "wdio": "wdio run ./wdio.conf.ts"
+    "test:appium": "wdio wdio.conf.js",
+    "wdio": "wdio run ./wdio.conf.js"
   },
   "dependencies": {
     "@expo/metro-config": "^0.20.14",
@@ -78,7 +75,7 @@
     "@wdio/spec-reporter": "^9.15.0",
     "@wdio/visual-service": "^8.0.4",
     "appium": "^2.19.0",
-    "appium-uiautomator2-driver": "^2.45.1",
+    "appium-uiautomator2-driver": "^4.2.3",
     "appium-xcuitest-driver": "^5.6.0",
     "autoprefixer": "^10.4.21",
     "chai": "^5.2.0",
