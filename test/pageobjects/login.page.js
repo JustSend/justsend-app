@@ -13,6 +13,10 @@ class LoginPage {
     return $('android=new UiSelector().resourceId("Login Button")');
   }
 
+  get createAccountButton() {
+    return $('android=new UiSelector().resourceId("Sign Up")');
+  }
+
   get errorMessage() {
     return $('android=new UiSelector().resourceId("Error Message")');
   }
@@ -21,6 +25,10 @@ class LoginPage {
     await this.emailInput.setValue(email);
     await this.passwordInput.setValue(password);
     await this.loginButton.click();
+  }
+
+  async navigateToRegister() {
+    await this.createAccountButton.click();
   }
 
   async open() {

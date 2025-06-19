@@ -22,6 +22,7 @@
     "test:appium:send": "wdio run ./wdio.conf.js --spec ./test/specs/send.e2e.js",
     "test:appium:withdraw": "wdio run ./wdio.conf.js --spec ./test/specs/withdraw.e2e.js",
     "test:appium:receive": "wdio run ./wdio.conf.js --spec ./test/specs/receive.e2e.js",
+    "test:appium:register": "wdio run ./wdio.conf.js --spec ./test/specs/register.e2e.js",
     "test:appium:all": "wdio run ./wdio.conf.js",
     "appium:inspector": "appium-inspector",
     "inspector": "node scripts/start-inspector.js",

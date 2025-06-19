@@ -8,6 +8,20 @@ describe('Login Page Tests', () => {
     console.log('🔄 Starting new test...');
     await LoginPage.open();
     await LoginPage.clearInputs();
+
+    // Verify Create Account button is available and click it to navigate to register
+    try {
+      await wdioExpect(LoginPage.createAccountButton).toBeDisplayed();
+      console.log(
+        '✅ Create Account button found - navigating to register page'
+      );
+      await LoginPage.navigateToRegister();
+      await browser.pause(2000);
+    } catch (error) {
+      console.log(
+        '❌ Create Account button not found - cannot navigate to register'
+      );
+    }
   });
 
   it('should display all login elements', async () => {
@@ -21,6 +35,9 @@ describe('Login Page Tests', () => {
 
     await wdioExpect(LoginPage.loginButton).toBeDisplayed();
     console.log('✅ Login button is visible');
+
+    await wdioExpect(LoginPage.createAccountButton).toBeDisplayed();
+    console.log('✅ Create Account button is visible');
   });
 
   it('should allow entering email and password', async () => {

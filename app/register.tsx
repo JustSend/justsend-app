@@ -109,6 +109,7 @@ export default function Register() {
           keyboardType="email-address"
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
+          testID="Email Input"
         />
         <TextInput
           placeholder="Password"
@@ -117,6 +118,7 @@ export default function Register() {
           secureTextEntry
           style={GlobalStyles.input}
           placeholderTextColor={Colors.muted}
+          testID="Password Input"
         />
 
         <TouchableOpacity
@@ -127,13 +129,18 @@ export default function Register() {
             loading && { opacity: 0.6 },
           ]}
           onPress={handleRegister}
+          testID="Register Button"
         >
           <Text style={GlobalStyles.buttonText}>
             {loading ? 'Creating Account...' : 'Create Account'}
           </Text>
         </TouchableOpacity>
 
-        {error && <Text style={GlobalStyles.errorText}>{error}</Text>}
+        {error && (
+          <Text style={GlobalStyles.errorText} testID="Error Message">
+            {error}
+          </Text>
+        )}
 
         <View style={GlobalStyles.divider}>
           <View style={GlobalStyles.dividerLine} />
@@ -153,6 +160,7 @@ export default function Register() {
             Keyboard.dismiss();
             router.navigate('/login');
           }}
+          testID="Sign In Button"
         >
           <Text style={GlobalStyles.secondaryButtonText}>Sign In</Text>
         </TouchableOpacity>

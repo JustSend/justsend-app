@@ -8,6 +8,21 @@ describe('Deposit Tests', () => {
     console.log('🔄 Starting deposit test...');
     await DepositPage.open();
     await DepositPage.clearInputs();
+
+    // Try to find and click Create Account button if available
+    try {
+      const createAccountButton = await browser.$(
+        'android=new UiSelector().resourceId("Sign Up")'
+      );
+      await createAccountButton.waitForDisplayed({ timeout: 3000 });
+      console.log(
+        '✅ Create Account button found - navigating to register page'
+      );
+      await createAccountButton.click();
+      await browser.pause(2000);
+    } catch (error) {
+      console.log('ℹ️  Create Account button not found on current page');
+    }
   });
 
   it('should display deposit form elements', async () => {
