@@ -1,6 +1,6 @@
 describe('Register user', () => {
-  const email: string = Cypress.env('TEST_USER_EMAIL');
-  const password: string = Cypress.env('TEST_USER_PASSWORD');
+  const email: string = Cypress.env('TEST_REGISTER_EMAIL');
+  const password: string = Cypress.env('TEST_REGISTER_PASSWORD');
 
   it('should load the register form', () => {
     cy.visit('/register');

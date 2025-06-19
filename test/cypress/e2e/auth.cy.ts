@@ -1,8 +1,4 @@
 describe('Authentication', () => {
-  beforeEach(() => {
-    // cy.visit('/login');
-  });
-
   it('should show login form when not authenticated', () => {
     cy.visit('/login');
     cy.get('input[type="email"]').should('exist');
@@ -12,8 +8,8 @@ describe('Authentication', () => {
 
   it('should handle login with valid credentials', () => {
     cy.visit('/login');
-    const email = Cypress.env('TEST_USER_EMAIL');
-    const password = Cypress.env('TEST_USER_PASSWORD');
+    const email = Cypress.env('TEST_REGISTER_EMAIL');
+    const password = Cypress.env('TEST_REGISTER_PASSWORD');
 
     if (!email || !password) {
       cy.log('Test credentials not found in environment variables');

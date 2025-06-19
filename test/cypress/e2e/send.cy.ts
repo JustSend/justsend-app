@@ -1,6 +1,9 @@
 describe('Send Money Screen', () => {
   before(() => {
-    cy.login(Cypress.env('TEST_USER_EMAIL'), Cypress.env('TEST_USER_PASSWORD'));
+    cy.loginCypress(
+      Cypress.env('TEST_REGISTER_EMAIL'),
+      Cypress.env('TEST_REGISTER_PASSWORD')
+    );
   });
 
   beforeEach(() => {
