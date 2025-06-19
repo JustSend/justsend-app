@@ -22,10 +22,7 @@ export function useDeposit() {
         bank_routing: params.bankRouting,
       };
 
-      const response = await apiPrivate.post(
-        '/api/wallet/deposit',
-        depositData
-      );
+      const response = await apiPrivate.post('/api/wallet/debin', depositData);
       console.log(response.data);
       return response.data;
     } catch (err: any) {
