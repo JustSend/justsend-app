@@ -1,40 +1,35 @@
-const { $ } = require('@wdio/globals');
-const Page = require('./page');
+const { $, browser } = require('@wdio/globals');
 
-/**
- * sub page containing specific selectors and methods for a specific page
- */
-class LoginPage extends Page {
-  /**
-   * define selectors using getter methods
-   */
-  get inputUsername() {
-    return $('#username');
+class LoginPage {
+  get emailInput() {
+    return $('android=new UiSelector().resourceId("Email Input")');
   }
 
-  get inputPassword() {
-    return $('#password');
+  get passwordInput() {
+    return $('android=new UiSelector().resourceId("Password Input")');
   }
 
-  get btnSubmit() {
-    return $('button[type="submit"]');
+  get loginButton() {
+    return $('android=new UiSelector().resourceId("Login Button")');
   }
 
-  /**
-   * a method to encapsule automation code to interact with the page
-   * e.g. to login using username and password
-   */
-  async login(username, password) {
-    await this.inputUsername.setValue(username);
-    await this.inputPassword.setValue(password);
-    await this.btnSubmit.click();
+  get errorMessage() {
+    return $('android=new UiSelector().resourceId("Error Message")');
   }
 
-  /**
-   * overwrite specific options to adapt it to page object
-   */
-  open() {
-    return super.open('login');
+  async login(email, password) {
+    await this.emailInput.setValue(email);
+    await this.passwordInput.setValue(password);
+    await this.loginButton.click();
+  }
+
+  async open() {
+    await browser.pause(5000);
+  }
+
+  async clearInputs() {
+    await this.emailInput.clearValue();
+    await this.passwordInput.clearValue();
   }
 }
 

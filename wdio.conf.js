@@ -22,8 +22,6 @@ exports.config = {
   // of the config file unless it's absolute.
   //
   specs: ['./test/specs/*.e2e.js'],
-  // Patterns to exclude.
-  exclude: [],
   //
   // ============
   // Capabilities
@@ -83,26 +81,6 @@ exports.config = {
   //     webdriver: 'info',
   //     '@wdio/appium-service': 'info'
   // },
-  //
-  // If you only want to run your tests until a specific amount of tests have failed use
-  // bail (default is 0 - don't bail, run all tests).
-  bail: 0,
-  //
-  // Set a base URL in order to shorten url command calls. If your `url` parameter starts
-  // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
-  // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
-  // gets prepended directly.
-  // baseUrl: 'http://localhost:8080',
-  //
-  // Default timeout for all waitFor* commands.
-  waitforTimeout: 10000,
-  //
-  // Default timeout in milliseconds for request
-  // if browser driver or grid doesn't send response
-  connectionRetryTimeout: 120000,
-  //
-  // Default request retries count
-  connectionRetryCount: 3,
   //
   // Test runner services
   // Services take over a specific job you don't want to take care of. They enhance
