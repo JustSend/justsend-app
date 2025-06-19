@@ -5,6 +5,13 @@ exports.config = {
   // ====================
   // WebdriverIO supports running e2e tests as well as unit and component tests.
   runner: 'local',
+  autoCompileOpts: {
+    autoCompile: true,
+    tsNodeOpts: {
+      project: './tsconfig.json',
+      transpileOnly: true,
+    },
+  },
   port: 4723,
   //
   // ==================
@@ -22,6 +29,7 @@ exports.config = {
   // of the config file unless it's absolute.
   //
   specs: ['./test/specs/*.e2e.js'],
+  exclude: [],
   //
   // ============
   // Capabilities
@@ -56,6 +64,8 @@ exports.config = {
       'appium:appActivity': '.MainActivity',
       'appium:noReset': true,
       'appium:autoGrantPermissions': true,
+      'appium:newCommandTimeout': 30,
+      'appium:uiautomator2ServerLaunchTimeout': 30000,
     },
   ],
 
@@ -65,22 +75,13 @@ exports.config = {
   // ===================
   // Define all options that are relevant for the WebdriverIO instance here
   //
-  // Level of logging verbosity: trace | debug | info | warn | error | silent
-  logLevel: 'info',
-  //
-  // Set specific log levels per logger
-  // loggers:
-  // - webdriver, webdriverio
-  // - @wdio/browserstack-service, @wdio/devtools-service, @wdio/sauce-service
-  // - @wdio/mocha-framework, @wdio/jasmine-framework
-  // - @wdio/local-runner
-  // - @wdio/sumologic-reporter
-  // - @wdio/cli, @wdio/config, @wdio/utils
-  // Level of logging verbosity: trace | debug | info | warn | error | silent
-  // logLevels: {
-  //     webdriver: 'info',
-  //     '@wdio/appium-service': 'info'
-  // },
+  logLevel: 'warn',
+  logLevels: {
+    webdriver: 'warn',
+    '@wdio/appium-service': 'warn',
+    '@wdio/local-runner': 'warn',
+    '@wdio/mocha-framework': 'warn',
+  },
   //
   // Test runner services
   // Services take over a specific job you don't want to take care of. They enhance
@@ -109,13 +110,23 @@ exports.config = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: https://webdriver.io/docs/dot-reporter
-  reporters: ['spec'],
+  reporters: [
+    'spec',
+    [
+      'allure',
+      {
+        outputDir: 'allure-results',
+        disableWebdriverStepsReporting: true,
+        disableWebdriverScreenshotsReporting: false,
+      },
+    ],
+  ],
 
   // Options to be passed to Mocha.
   // See the full list at http://mochajs.org/
   mochaOpts: {
     ui: 'bdd',
-    timeout: 60000,
+    timeout: 30000,
   },
 
   //
@@ -275,5 +286,9 @@ exports.config = {
    * @param {object} params information about the assertion that was executed, including its results
    */
   // afterAssertion: function(params) {
-  // }
+  // },
+  bail: 0,
+  waitforTimeout: 5000,
+  connectionRetryTimeout: 60000,
+  connectionRetryCount: 2,
 };

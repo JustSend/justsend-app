@@ -24,12 +24,12 @@ class LoginPage {
   }
 
   async open() {
-    await browser.pause(5000);
+    await browser.pause(2000);
   }
 
   async clearInputs() {
-    await this.emailInput.clearValue();
-    await this.passwordInput.clearValue();
+    await this.emailInput.setValue('');
+    await this.passwordInput.setValue('');
   }
 }
 
