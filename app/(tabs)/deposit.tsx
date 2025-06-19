@@ -167,6 +167,7 @@ export default function DepositScreen() {
         value={bankRouting}
         onChangeText={handleBankRoutingChange}
         maxLength={9}
+        testID="Routing Input"
       />
 
       <View style={depositStyles.amountCurrencyRow}>
@@ -192,6 +193,7 @@ export default function DepositScreen() {
               setAmount(text);
               setShowAmountError(false);
             }}
+            testID="Amount Input"
           />
         </View>
         <View style={{ flex: 1 }}>
@@ -217,6 +219,7 @@ export default function DepositScreen() {
         style={[depositStyles.button, loading && depositStyles.buttonDisabled]}
         onPress={handleDeposit}
         disabled={loading}
+        testID="Deposit Button"
       >
         <Text style={depositStyles.buttonText}>
           {loading ? 'Processing...' : 'Deposit with DEBIN'}

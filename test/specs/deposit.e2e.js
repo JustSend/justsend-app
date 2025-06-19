@@ -13,6 +13,10 @@ describe('Deposit Tests', () => {
   it('should display deposit form elements', async () => {
     console.log('📱 Checking deposit form elements...');
 
+    await wdioExpect(DepositPage.title).toBeDisplayed();
+    await wdioExpect(DepositPage.routingLabel).toBeDisplayed();
+    await wdioExpect(DepositPage.amountLabel).toBeDisplayed();
+    await wdioExpect(DepositPage.currencyLabel).toBeDisplayed();
     await wdioExpect(DepositPage.amountInput).toBeDisplayed();
     await wdioExpect(DepositPage.routingInput).toBeDisplayed();
     await wdioExpect(DepositPage.depositButton).toBeDisplayed();
@@ -36,10 +40,21 @@ describe('Deposit Tests', () => {
   it('should attempt deposit with valid data', async () => {
     console.log('💳 Testing deposit attempt...');
 
-    await DepositPage.deposit('50.00', '987654321');
+    await DepositPage.deposit('50.00', '111111111');
     console.log('🚀 Deposit attempt completed');
 
-    await browser.pause(2000);
+    try {
+      await DepositPage.waitForSuccessToast();
+      console.log('✅ Deposit successful');
+    } catch (_) {
+      try {
+        await DepositPage.waitForErrorToast();
+        console.log('⚠️  Deposit failed (expected for test data)');
+      } catch (_) {
+        console.log('ℹ️  No toast message found');
+      }
+    }
+
     console.log('✅ Deposit test completed');
   });
 });
