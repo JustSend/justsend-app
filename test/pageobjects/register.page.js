@@ -18,7 +18,7 @@ class RegisterPage {
   }
 
   get title() {
-    return $('android=new UiSelector().text("Create Account")');
+    return $('android=new UiSelector().textContains("Join JustSend")');
   }
 
   get subtitle() {
@@ -62,10 +62,8 @@ class RegisterPage {
   async open() {
     console.log('🔄 Navigating to register page...');
 
-    // First, try to find if we're already on register page
     try {
       await this.title.waitForDisplayed({ timeout: 2000 });
-      console.log('✅ Already on register page');
       return;
     } catch (error) {
       console.log('📱 Not on register page, attempting navigation...');
