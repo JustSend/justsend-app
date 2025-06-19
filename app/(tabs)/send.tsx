@@ -187,6 +187,7 @@ export default function SendScreen() {
                     setSelectedUser(null);
                     setShowResults(true);
                   }}
+                  testID="Recipient Input"
                 />
               )}
               {searchLoading && isFocused && (
@@ -264,6 +265,7 @@ export default function SendScreen() {
                     setAmount(text);
                     setShowAmountError(false);
                   }}
+                  testID="Amount Input"
                 />
               </View>
               <View style={{ flex: 1 }}>
@@ -295,6 +297,7 @@ export default function SendScreen() {
               ]}
               onPress={handleSend}
               disabled={!selectedUser || sendLoading}
+              testID="Send Button"
             >
               <Text style={depositStyles.buttonText}>
                 {sendLoading ? 'Sending...' : 'Send Money'}
