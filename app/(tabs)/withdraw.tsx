@@ -142,6 +142,7 @@ export default function WithdrawScreen() {
                     setAmount(text);
                     setShowAmountError(false);
                   }}
+                  testID="Amount Input"
                 />
               </View>
               <View style={{ flex: 1 }}>
@@ -189,6 +190,7 @@ export default function WithdrawScreen() {
                   setRoutingNumber(text);
                   setShowRoutingError(false);
                 }}
+                testID="Routing Input"
               />
             </View>
 

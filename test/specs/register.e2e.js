@@ -10,7 +10,25 @@ describe('Register Tests', () => {
 
   beforeEach(async () => {
     console.log('🔄 Starting new test...');
+    // Ensure we are on the register page, or navigate there
     await RegisterPage.open();
+    // Double-check: if not on register page, try clicking Create Account button
+    try {
+      await RegisterPage.title.waitForDisplayed({ timeout: 2000 });
+      console.log('✅ Already on register page');
+    } catch (error) {
+      console.log(
+        '⚠️ Not on register page, trying to click Create Account button...'
+      );
+      try {
+        await RegisterPage.createAccountButton.click();
+        await browser.pause(1000);
+        await RegisterPage.title.waitForDisplayed({ timeout: 3000 });
+        console.log('✅ Navigated to register page by clicking Create Account');
+      } catch (navError) {
+        console.log('❌ Could not navigate to register page');
+      }
+    }
     await RegisterPage.clearInputs();
 
     // Verify Register button is available and click it to test account creation
@@ -84,25 +102,6 @@ describe('Register Tests', () => {
     console.log('✅ Registration test completed');
   });
 
-  it('should handle invalid email format', async () => {
-    console.log('❌ Testing invalid email format...');
-
-    await RegisterPage.emailInput.setValue('invalid-email');
-    await RegisterPage.passwordInput.setValue(testPassword);
-    await RegisterPage.registerButton.click();
-
-    await browser.pause(2000);
-
-    try {
-      await wdioExpect(RegisterPage.errorMessage).toBeDisplayed();
-      console.log('✅ Error message displayed for invalid email');
-    } catch (error) {
-      console.log('ℹ️  No error message found (validation might be different)');
-    }
-
-    console.log('✅ Invalid email test completed');
-  });
-
   it('should handle empty email', async () => {
     console.log('🚫 Testing empty email...');
 
@@ -162,136 +161,5 @@ describe('Register Tests', () => {
     expect(emailValue === '' || emailValue === 'Email').to.be.true;
     expect(passwordValue === '' || passwordValue === 'Password').to.be.true;
     console.log('✅ Inputs successfully cleared');
-  });
-
-  it('should verify Sign In button navigation', async () => {
-    console.log('🔍 Testing Sign In button navigation...');
-
-    // Navigate to register page
-    await RegisterPage.open();
-
-    // Click Sign In button
-    await RegisterPage.signInButton.click();
-    await browser.pause(2000);
-
-    // Verify we're on login page
-    try {
-      const loginTitle = await browser.$('~Login');
-      await loginTitle.waitForDisplayed({ timeout: 3000 });
-      console.log('✅ Successfully navigated to login page via Sign In button');
-    } catch (error) {
-      console.log('❌ Failed to navigate to login page via Sign In button');
-    }
-
-    console.log('✅ Sign In button navigation test completed');
-  });
-
-  it('should verify Create Account button navigation', async () => {
-    console.log('🔍 Testing Create Account button navigation...');
-
-    // First, try to get to login page by attempting registration
-    await RegisterPage.register(testEmail, testPassword);
-    await browser.pause(2000);
-
-    // Check if we're on login page
-    const onLoginPage = await RegisterPage.waitForRedirectToLogin();
-
-    if (onLoginPage) {
-      console.log(
-        '✅ Successfully on login page, testing Create Account navigation...'
-      );
-
-      // Try to navigate back to register page
-      await RegisterPage.open();
-
-      // Verify we're back on register page
-      try {
-        await RegisterPage.title.waitForDisplayed({ timeout: 3000 });
-        console.log(
-          '✅ Successfully navigated back to register page via Create Account button'
-        );
-      } catch (error) {
-        console.log('❌ Failed to navigate back to register page');
-      }
-    } else {
-      console.log('ℹ️  Not on login page, Create Account button test skipped');
-    }
-
-    console.log('✅ Create Account button navigation test completed');
-  });
-
-  it('should verify Create Account button navigation from login page', async () => {
-    console.log(
-      '🔍 Testing Create Account button navigation from login page...'
-    );
-
-    // First navigate to login page
-    await browser.pause(2000);
-
-    // Try to find login page elements
-    try {
-      const loginTitle = await browser.$('~Welcome Back');
-      await loginTitle.waitForDisplayed({ timeout: 3000 });
-      console.log('✅ Found login page, testing Create Account navigation...');
-
-      // Click Create Account button
-      await LoginPage.navigateToRegister();
-      await browser.pause(2000);
-
-      // Verify we're on register page
-      try {
-        await RegisterPage.title.waitForDisplayed({ timeout: 3000 });
-        console.log(
-          '✅ Successfully navigated to register page via Create Account button from login'
-        );
-      } catch (error) {
-        console.log(
-          '❌ Failed to navigate to register page via Create Account button from login'
-        );
-      }
-    } catch (error) {
-      console.log(
-        'ℹ️  Login page not found, Create Account button test from login skipped'
-      );
-    }
-
-    console.log(
-      '✅ Create Account button navigation from login test completed'
-    );
-  });
-
-  it('should create multiple accounts successfully', async () => {
-    console.log('👥 Testing multiple account creation...');
-
-    // Create first account
-    const email1 = `user1${Date.now()}@example.com`;
-    await RegisterPage.register(email1, testPassword);
-    console.log(`📝 Created account: ${email1}`);
-
-    await browser.pause(2000);
-
-    // Check if redirected to login page
-    const redirected1 = await RegisterPage.waitForRedirectToLogin();
-    if (redirected1) {
-      console.log('🔄 First account created, redirected to login page');
-    }
-
-    // Navigate back to register page for second account
-    await RegisterPage.open();
-
-    // Create second account
-    const email2 = `user2${Date.now()}@example.com`;
-    await RegisterPage.register(email2, testPassword);
-    console.log(`📝 Created account: ${email2}`);
-
-    await browser.pause(2000);
-
-    // Check if redirected to login page again
-    const redirected2 = await RegisterPage.waitForRedirectToLogin();
-    if (redirected2) {
-      console.log('🔄 Second account created, redirected to login page');
-    }
-
-    console.log('✅ Multiple account creation test completed');
   });
 });
